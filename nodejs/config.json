@@ -1,0 +1,20 @@
+{
+	"username": "<username>",
+	"password": "<password hash>",
+	"api_url": "https://<api.hostname>/v2",
+
+	"domain": "<domain>",
+	"senderId": "<sender id>",
+	"senderName": "<sender name>",
+	"senderAddress": "<sender address>",
+	"fields": {
+		"RCPT_TYPE_V2": "numeric",
+		"LANGUAGE_V2": "text"
+		},
+
+	"scp_username": "<SFTP username>",
+	"scp_password": "<SFTP password>",
+	"scp_host": "<emarsys URL>",
+	"scp_port": "<port>"
+}
+

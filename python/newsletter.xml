@@ -1,0 +1,76 @@
+<batch>
+  <runDate>{rundate}</runDate>
+  <properties>
+    <property key="Sender">default</property>
+    <property key="Language">en</property>
+    <property key="Encoding">iso-8859-1</property>
+    <property key="Domain">{domain}</property>
+    <property key="IncludeHeader">false</property>
+  </properties>
+  <subject> Emarsys API Test (##subject##) </subject>
+  <html>
+      &lt;html&gt;
+        &lt;head&gt;
+          &lt;title&gt;$$RCPT_DOMAIN$$&lt;/title&gt;
+          &lt;meta http-equiv="Content-Type" content="text/html; charset=UTF-8"&gt;
+        &lt;/head&gt;
+
+        &lt;body&gt;
+
+          ##HEADER##
+
+          &lt;p&gt;This is a test with a &lt;a href="http://www.emarsys.com"&gt;link&lt;/a&gt;&lt;/p&gt;
+
+          ##FOOTER##
+
+        &lt;/body&gt;
+      &lt;/html&gt;
+  </html>
+  <conditions>
+    <condition id="HEADER">
+      <cases>
+        <case>
+          <when>(LANGUAGE_v2 = "en") and (not(RCPT_TYPE_v2 in (1,2,3,4)))</when>
+          <html> &lt;h1&gt;Header 1&lt;/h1&gt; </html>
+        </case>
+        <case>
+          <when>(LANGUAGE_v2 = "de") and (RCPT_TYPE_v2 in (1,2,3,4))</when>
+          <html> &lt;h1&gt;Header 2&lt;/h1&gt; </html>
+        </case>
+      </cases>
+      <otherwise>
+        <html> &lt;h1&gt;other Header&lt;/h1&gt; </html>
+      </otherwise>
+    </condition>
+    <condition id="FOOTER">
+      <cases>
+        <case>
+          <when>(LANGUAGE_v2 contains "n") and (RCPT_TYPE_v2 &lt; 1)</when>
+          <html> &lt;div&gt;footer1&lt;/div&gt; </html>
+        </case>
+        <case>
+          <when>(LANGUAGE_v2 contains "d") and (RCPT_TYPE_v2 &gt; 1)</when>
+          <html> &lt;div&gt;footer2&lt;/div&gt; </html>
+        </case>
+      </cases>
+      <otherwise>
+        <html> &lt;div&gt;other footer&lt;/div&gt; </html>
+      </otherwise>
+    </condition>
+    <condition id="SUBJECT">
+      <cases>
+        <case>
+          <when>(RCPT_TYPE_v2 equals 0)</when>
+          <text> subject 1 </text>
+        </case>
+        <case>
+          <when>(RCPT_TYPE_v2 equals 4)</when>
+          <text> subject 2 </text>
+        </case>
+      </cases>
+      <otherwise>
+        <text> other subject </text>
+      </otherwise>
+    </condition>
+  </conditions>
+</batch>

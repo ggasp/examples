@@ -1,0 +1,4 @@
+EMAIL,RCPT_TYPE_v2,LANGUAGE_v2
+test@example.com,0,en
+test@example.com,2,en
+test@example.com,4,de
