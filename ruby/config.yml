@@ -1,0 +1,10 @@
+username: <username>
+password: <password hash>
+api_host: <emarsys URL>
+api_base: /bmapi/accounts/<account ID>
+scp_username: <SFTP username>
+scp_password: <SFTP password>
+scp_host: <emarsys URL>
+scp_port: <port>
+scp_directory: "/home/<SFTP username>"
+domain: <domain>

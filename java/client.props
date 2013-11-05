@@ -1,0 +1,11 @@
+accountId=<account ID>
+bmapiUsername=<username>
+bmapiPwdHash=<password hash>
+bmapiBaseUrl=https://<emarsys URL>/bmapi/accounts/
+scpUsername=<SFTP username>
+scpPassword=<SFTP password>
+scpPort=<port>
+scpRemoteHost=<eamrsys URL>
+scpRemoteRootDir=/home/<SFTP username>
+localRecipientsFilePath=recipients.csv
+domain=<domain>
