@@ -1,6 +1,6 @@
 apiUsername=<username>
 apiPasswordHash=<password hash>
-apiBaseUrl=https://<emarsys API URL>/v2/
+apiBaseUrl=https://<emarsys API URL>/v3/
 linkDomain=<domain>
 
 senderId=default
@@ -10,10 +10,4 @@ senderAddress=<sender e-mail address>
 localRecipientFile=recipients.csv
 localRecipientFile2=recipients2.csv
 
-scpHost=<emarsys SFTP URL>
-scpPort=<port>
-scpUsername=<SFTP username>
-scpPassword=<SFTP password>
-scpDirectory=/home/<SFTP username>
-
-fields=EMAIL,RCPT_TYPE_v2:NUMERIC,LANGUAGE_v2:TEXT
+fields=EMAIL,RCPT_TYPE_v3:NUMERIC,LANGUAGE_v3:TEXT

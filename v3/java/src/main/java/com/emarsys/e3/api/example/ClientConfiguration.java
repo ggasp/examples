@@ -16,7 +16,7 @@ public interface ClientConfiguration {
      */
     String getApiUsername();
 
-/**
+    /**
      * The password hash which is used to authenticate against the emarsys BMAPI.
      * @return
      */
@@ -35,25 +35,25 @@ public interface ClientConfiguration {
     String getLinkDomain();
 
     /**
-     * The path to the local recipients file which needs to be transferred via SCP.
+     * The senders ID
      * @return
      */
     String getSenderId();
 
     /**
-     * The path to the local recipients file which needs to be transferred via SCP.
+     * The senders name
      * @return
      */
     String getSenderName();
 
     /**
-     * The path to the local recipients file which needs to be transferred via SCP.
+     * The senders address
      * @return
      */
     String getSenderAddress();
 
     /**
-     * The path to the local recipients file which needs to be transferred via SCP.
+     * The path to the local recipients file which needs to be transferred.
      * @return
      */
     String getLocalRecipientFile(int num);
@@ -63,34 +63,4 @@ public interface ClientConfiguration {
     * @return
     */
     List<RecipientField> getFields();
-
-    /**
-     * The remote host where the recipient data files are copied to via SFTP.
-     * @return
-     */
-    String getScpHost();
-
-    /**
-     * The port the SCP service listens to.
-     * @return
-     */
-    int getScpPort();
-
-    /**
-     * The SCP user.
-     * @return
-     */
-    String getScpUsername();
-
-    /**
-     * The SCP password.
-     * @return
-     */
-    String getScpPassword();
-
-    /**
-     * The remote directory for all files to be copied via SCP.
-     * @return
-     */
-    String getScpDirectory();
 }

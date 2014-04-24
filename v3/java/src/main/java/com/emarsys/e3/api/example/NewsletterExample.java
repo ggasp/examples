@@ -50,58 +50,47 @@ public final class NewsletterExample {
             this.props = props;
         }
 
+        @Override
         public String getApiUsername() {
             return this.props.getProperty( "apiUsername" );
         }
 
+        @Override
         public String getApiPasswordHash() {
             return this.props.getProperty( "apiPasswordHash" );
         }
 
+        @Override
         public String getApiBaseURL() {
             return this.props.getProperty( "apiBaseUrl" );
         }
 
+        @Override
         public String getLinkDomain() {
             return this.props.getProperty( "linkDomain" );
         }
 
+        @Override
         public String getSenderId() {
             return this.props.getProperty( "senderId" );
         }
 
+        @Override
         public String getSenderName() {
             return this.props.getProperty( "senderName" );
         }
 
+        @Override
         public String getSenderAddress() {
             return this.props.getProperty( "senderAddress" );
         }
 
-        public String getScpHost() {
-            return this.props.getProperty( "scpHost" );
-        }
-
-        public int getScpPort() {
-            return new Integer( this.props.getProperty( "scpPort" ) );
-        }
-
-        public String getScpUsername() {
-            return this.props.getProperty( "scpUsername" );
-        }
-
-        public String getScpPassword() {
-            return this.props.getProperty( "scpPassword" );
-        }
-
-        public String getScpDirectory() {
-            return this.props.getProperty( "scpDirectory" );
-        }
-
+        @Override
         public String getLocalRecipientFile(int num) {
             return this.props.getProperty( "localRecipientFile" );
         }
 
+        @Override
         public List<RecipientField> getFields() {
             List<RecipientField> fields = new ArrayList<RecipientField>();
 
@@ -142,7 +131,7 @@ public final class NewsletterExample {
     public static void main(String[] args) {
         try {
 
-            out.println( "starting emarsys BMAPI newsletter example. pwd:" + new File(".").getAbsolutePath() );
+            out.println( "Starting emarsys BMAPI newsletter example. pwd:" + new File(".").getAbsolutePath() );
 
             NewsletterExample example;
             example = new NewsletterExample("BatchExample" + System.currentTimeMillis());
@@ -151,8 +140,8 @@ public final class NewsletterExample {
 
             BatchMailing batchMailing = new BatchMailing(example.batchName, example.config);
             batchMailing.create();
-            batchMailing.transferRecipientData(example.config.getLocalRecipientFile(0));
-            batchMailing.triggerImport();
+            batchMailing.transferRecipientList(example.config.getLocalRecipientFile(0));
+            batchMailing.finishRecipientList();
 
         } catch (Exception ex) {
             ex.printStackTrace();

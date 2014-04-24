@@ -97,7 +97,7 @@ public class APIClient {
             this.createMissingSender();
             this.createMissingRecipientFields();
 
-            String requestURL = this.config.getApiBaseURL() + "batches/" + name;
+            String requestURL = this.config.getApiBaseURL() + "batch_mailings/" + name;
             Response response = this.restClient.doPost(
                 requestURL,
                 XMLRequests.createBatchMailingRequest(name, this.config.getLinkDomain())
@@ -257,14 +257,61 @@ public class APIClient {
     }
 
     /**
-     * Posts the recipient list via an API call.
+     * Posts the recipient list for a transactional mailing via an API call.
      *
      * @throws APIException
+     * @throws IOException
      */
-    public void postRecipients( String name, int revision, File recipientFile ) throws APIException, IOException {
+    public void postTransactionalRecipients( String name, int revision, File recipientFile ) throws APIException, IOException {
+
+        postRecipients( 
+            getTransactionalMailingURL( name ) + "/revisions/" + revision + "/recipients",
+            name,
+            revision,
+            recipientFile
+        );
+    }
+
+    /**
+     * Posts the recipient list for a batch mailing via an API call.
+     *
+     * @throws APIException
+     * @throws IOException
+     */
+    public void postBatchRecipients( String name, File recipientFile ) throws APIException, IOException {
+
+        postRecipients( 
+            getBatchMailingURL( name ) + "/recipients",
+            name,
+            revision,
+            recipientFile
+        );
+    }
+
+    /**
+     * Finishes the recipient list for a batch mailing via an API call.
+     *
+     * @throws APIException
+     * @throws IOException
+     */
+    public void finishBatchRecipients( String name ) throws APIException, IOException {
+
+        String requestURL = getBatchMailingURL( name ) + "/recipients/status?status=FINISHED"
+        Response response = this.restClient.doPost( requestURL, "" );
+        if( Status.SUCCESS_OK.equals( response.getStatus() ) ) {
+            out.println( "Finished the recipient list.");
+        }
+    }
+
+    /**
+     * Posts the recipient list via an API call to a specific URL.
+     *
+     * @throws APIException
+     * @throws IOException
+     */
+    private void postRecipients( String requestURL, String name, int revision, File recipientFile ) throws APIException, IOException {
 
         String recipients = getRecipients( recipientFile );
-        String requestURL = getTransactionalMailingURL( name ) + "/revisions/" + revision + "/recipients";
         Response response = this.restClient.doPost( requestURL, recipients );
 
         if( Status.SUCCESS_OK.equals( response.getStatus() ) ) {
@@ -287,31 +334,6 @@ public class APIClient {
         br.close();
 
         return recipients;
-    }
-
-    /**
-     * Triggers the import process via an HTTP call.
-     *
-     * @throws APIException
-     */
-    public void triggerImport(String batch, String filePath) throws APIException {
-
-        try {
-
-            String importRequestURL = getBatchMailingURL(batch) + "/import";
-            Response response = this.restClient.doPost(
-                importRequestURL,
-                XMLRequests.triggerImportRequest(filePath)
-            );
-
-            if (Status.SUCCESS_OK.equals(response.getStatus())) {
-                out.println("successfully triggered import for " + this);
-            } else {
-                fireFailedRequest("failed to trigger import", response.getStatus());
-            }
-        } catch (IOException ioe) {
-            fireFailedRequest("failed import request", ioe);
-        }
     }
 
     /**
@@ -391,7 +413,7 @@ public class APIClient {
     }
 
     private String getBatchMailingURL(String name) {
-        return this.config.getApiBaseURL() + "batches/" + name;
+        return this.config.getApiBaseURL() + "batch_mailings/" + name;
     }
 
     private String getTransactionalMailingURL(String name) {

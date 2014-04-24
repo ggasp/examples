@@ -46,7 +46,7 @@ final class XMLRequests {
     private static final String textContent = "This is the test text content for transactional mail.";
 
     private static final String confirmationMailRequest =
-         "<mailing>" +
+         "<transactional_mailing>" +
             "<!-- These properties can be defaulted on the account, and do not need to be specified each time. -->" +
             "<properties>" +
                 "<property key=\"Sender\">default</property>" +
@@ -54,9 +54,9 @@ final class XMLRequests {
                 "<property key=\"Encoding\">iso-8859-1</property>" +
                 "<property key=\"Domain\">{10}</property>" +
             "</properties>" +
-            "<recipientFields>" +
+            "<recipient_fields>" +
                 "{11}" +
-            "</recipientFields>" +
+            "</recipient_fields>" +
             "<subject>Emarsys API Test (##subject##)</subject>" +
             "<html>" +
                 "{0}" + // html content
@@ -64,64 +64,64 @@ final class XMLRequests {
             "<text>" +
             "{12}" +
             "</text>" +
-            "<conditions>" +
-                "<condition id=\"HEADER\">" +
+            "<conditional_contents>" +
+                "<conditional_content id=\"HEADER\">" +
                     "<cases>" +
                         "<case>" +
-                            "<when><![CDATA[(LANGUAGE_v2 = \"en\") and (not(RCPT_TYPE_v2 in (1,2,3,4)))]]></when>" +
+                            "<when><![CDATA[(LANGUAGE_v3 = \"en\") and (not(RCPT_TYPE_v3 in (1,2,3,4)))]]></when>" +
                             "<html>{1}</html>" +  // header1
                         "</case>" +
                         "<case>" +
-                            "<when><![CDATA[(LANGUAGE_v2 = \"de\") and (RCPT_TYPE_v2 in (1,2,3,4))]]></when>" +
+                            "<when><![CDATA[(LANGUAGE_v3 = \"de\") and (RCPT_TYPE_v3 in (1,2,3,4))]]></when>" +
                             "<html>{2}</html>" + // header2
                         "</case>" +
                     "</cases>" +
                     "<otherwise>" +
                         "<html>{3}</html>" + // otherHeader
                     "</otherwise>" +
-                "</condition>" +
-                "<condition id=\"FOOTER\">" +
+                "</conditional_content>" +
+                "<conditional_content id=\"FOOTER\">" +
                     "<cases>" +
                         "<case>" +
-                            "<when><![CDATA[(LANGUAGE_v2 contains \"n\") and (RCPT_TYPE_v2 < 1)]]></when>" +
+                            "<when><![CDATA[(LANGUAGE_v3 contains \"n\") and (RCPT_TYPE_v3 < 1)]]></when>" +
                             "<html>{4}</html>" +  // footer1
                         "</case>" +
                         "<case>" +
-                            "<when><![CDATA[(LANGUAGE_v2 contains \"d\") and (RCPT_TYPE_v2 > 1)]]></when>" +
+                            "<when><![CDATA[(LANGUAGE_v3 contains \"d\") and (RCPT_TYPE_v3 > 1)]]></when>" +
                             "<html>{5}</html>" + // footer2
                         "</case>" +
                     "</cases>" +
                     "<otherwise>" +
                         "<html>{6}</html>" + // otherFooter
                     "</otherwise>" +
-                "</condition>" +
-                "<condition id=\"SUBJECT\">" +
+                "</conditional_content>" +
+                "<conditional_content id=\"SUBJECT\">" +
                     "<cases>" +
                         "<case>" +
-                            "<when><![CDATA[(RCPT_TYPE_v2 equals 0)]]></when>" +
+                            "<when><![CDATA[(RCPT_TYPE_v3 equals 0)]]></when>" +
                             "<text>{7}</text>" +  // subject1
                         "</case>" +
                         "<case>" +
-                            "<when><![CDATA[(RCPT_TYPE_v2 equals 4)]]></when>" +
+                            "<when><![CDATA[(RCPT_TYPE_v3 equals 4)]]></when>" +
                             "<text>{8}</text>" + // subject2
                         "</case>" +
                     "</cases>" +
                     "<otherwise>" +
                         "<text>{9}</text>" + // otherSubject
                     "</otherwise>" +
-                "</condition>" +
-            "</conditions>" +
-        "</mailing>";
+                "</conditional_content>" +
+            "</conditional_contents>" +
+        "</transactional_mailing>";
 
     private static final String newsletterExampleRequest =
-        "<batch>" +
+        "<batch_mailing>" +
             "<!-- This is the identifier for the batch mailing. -->" +
             "<name>{0}</name>" + // batch name
             "<!--" +
                 "When the broadcast is planned. For production broadcasts of over 1 million, please update the" +
                 "content with at least 1-2 hours of lead time." +
             "-->" +
-            "<runDate>{1}</runDate>" +// run date
+            "<start_date>{1}</start_date>" +// desired start date
             "<!-- These properties can be defaulted on the account, and do not need to be specified each time. -->" +
             "<properties>" +
                 "<property key=\"Sender\">default</property>" +
@@ -135,54 +135,54 @@ final class XMLRequests {
             "<html>" +
                 "{2}" + // html content
             "</html>" +
-            "<conditions>" +
-                "<condition id=\"HEADER\">" +
+            "<conditional_contents>" +
+                "<conditional_content id=\"HEADER\">" +
                     "<cases>" +
                         "<case>" +
-                            "<when><![CDATA[(LANGUAGE_v2 = \"en\") and (not(RCPT_TYPE_v2 in (1,2,3,4)))]]></when>" +
+                            "<when><![CDATA[(LANGUAGE_v3 = \"en\") and (not(RCPT_TYPE_v3 in (1,2,3,4)))]]></when>" +
                             "<html>{3}</html>" +  // header1
                         "</case>" +
                         "<case>" +
-                            "<when><![CDATA[(LANGUAGE_v2 = \"de\") and (RCPT_TYPE_v2 in (1,2,3,4))]]></when>" +
+                            "<when><![CDATA[(LANGUAGE_v3 = \"de\") and (RCPT_TYPE_v3 in (1,2,3,4))]]></when>" +
                             "<html>{4}</html>" + // header2
                         "</case>" +
                     "</cases>" +
                     "<otherwise>" +
                         "<html>{5}</html>" + // otherHeader
                     "</otherwise>" +
-                "</condition>" +
-                "<condition id=\"FOOTER\">" +
+                "</conditional_content>" +
+                "<conditional_content id=\"FOOTER\">" +
                     "<cases>" +
                         "<case>" +
-                            "<when><![CDATA[(LANGUAGE_v2 contains \"n\") and (RCPT_TYPE_v2 < 1)]]></when>" +
+                            "<when><![CDATA[(LANGUAGE_v3 contains \"n\") and (RCPT_TYPE_v3 < 1)]]></when>" +
                             "<html>{6}</html>" +  // footer1
                         "</case>" +
                         "<case>" +
-                            "<when><![CDATA[(LANGUAGE_v2 contains \"d\") and (RCPT_TYPE_v2 > 1)]]></when>" +
+                            "<when><![CDATA[(LANGUAGE_v3 contains \"d\") and (RCPT_TYPE_v3 > 1)]]></when>" +
                             "<html>{7}</html>" + // footer2
                         "</case>" +
                     "</cases>" +
                     "<otherwise>" +
                         "<html>{8}</html>" + // otherFooter
                     "</otherwise>" +
-                "</condition>" +
-                "<condition id=\"SUBJECT\">" +
+                "</conditional_content>" +
+                "<conditional_content id=\"SUBJECT\">" +
                     "<cases>" +
                         "<case>" +
-                            "<when><![CDATA[(RCPT_TYPE_v2 equals 0)]]></when>" +
+                            "<when><![CDATA[(RCPT_TYPE_v3 equals 0)]]></when>" +
                             "<text>{9}</text>" +  // subject1
                         "</case>" +
                         "<case>" +
-                            "<when><![CDATA[(RCPT_TYPE_v2 equals 4)]]></when>" +
+                            "<when><![CDATA[(RCPT_TYPE_v3 equals 4)]]></when>" +
                             "<text>{10}</text>" + // subject2
                         "</case>" +
                     "</cases>" +
                     "<otherwise>" +
                         "<text>{11}</text>" + // otherSubject
                     "</otherwise>" +
-                "</condition>" +
-            "</conditions>" +
-        "</batch>";
+                "</conditional_content>" +
+            "</conditional_contents>" +
+        "</batch_mailing>";
 
 
 
@@ -246,25 +246,6 @@ final class XMLRequests {
      */
     private static String getRunDate() {
         return DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZ").print( new DateTime().plusMinutes(5) );
-    }
-
-    private static final String triggerImportXML =
-        "<importRequest>" +
-            "<filePath>{0}</filePath>" + //recipients file
-            "<properties>" +
-                "<property key=\"Delimiter\">,</property>" +
-                "<property key=\"Encoding\">UTF-8</property>" +
-            "</properties>" +
-        "</importRequest>";
-
-    /**
-     *
-     * @param recipientsFile
-     * @return always a valid XML document as String, never null
-     */
-    static String triggerImportRequest( String recipientsFile )
-    {
-        return MessageFormat.format( triggerImportXML, recipientsFile );
     }
 
     private static final String addSenderXML =

@@ -53,7 +53,6 @@ public class BatchMailing {
 
     //client subsystems
     private final APIClient apiClient;
-    private final RecipientDataTransferer dataTransferer;    
 
     /**
      * Constructor.
@@ -65,9 +64,7 @@ public class BatchMailing {
 
         this.name = name;
         this.apiClient = new APIClient(config);
-        this.dataTransferer = new RecipientDataTransferer(config, this.name);
     }
-
 
     /**
      * Creates the batch mailing via an API call.
@@ -81,29 +78,23 @@ public class BatchMailing {
     }
 
     /**
-     * Transfers the batch's corresponding recipient data via SFTP.
+     * Transfers the content of the passed file (the recipients) via an API call.
      *
+     * @throws APIException
      * @throws IOException
      */
-    public void transferRecipientData( String filePath ) throws IOException {
-
-        this.dataTransferer.transferRecipientData(filePath);
-        out.println("transferred recipient data for " + this);
+    public void transferRecipientList(String recipientFile) throws APIException, IOException {
+        apiClient.postBatchRecipients( this.name, recipientFile );
     }
 
     /**
-     * Triggers the import process via an HTTP call.
+     * Closes (finishes) the current list of recipients.
      *
      * @throws APIException
+     * @throws IOException
      */
-    public void triggerImport() throws APIException {
-        if (!this.created) {
-            throw new IllegalArgumentException(
-                    "must not trigger import for non-existent " + this + "!"
-            );
-        }
-
-        apiClient.triggerImport( name, this.dataTransferer.getRemoteFileName() );
+    public void finishRecipientList() throws APIException, IOException {
+        apiClient.finishBatchRecipients( this.name );
     }
 
     @Override

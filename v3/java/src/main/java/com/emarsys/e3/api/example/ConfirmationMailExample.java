@@ -47,39 +47,48 @@ public final class ConfirmationMailExample {
             this.props = props;
         }
 
+        @Override
         public String getApiUsername() {
             return this.props.getProperty( "apiUsername" );
         }
 
+        @Override
         public String getApiPasswordHash() {
             return this.props.getProperty( "apiPasswordHash" );
         }
 
+        @Override
         public String getApiBaseURL() {
             return this.props.getProperty( "apiBaseUrl" );
         }
 
+        @Override
         public String getLinkDomain() {
             return this.props.getProperty( "linkDomain" );
         }
 
+        @Override
         public String getSenderId() {
             return this.props.getProperty( "senderId" );
         }
 
+        @Override
         public String getSenderName() {
             return this.props.getProperty( "senderName" );
         }
 
+        @Override
         public String getSenderAddress() {
             return this.props.getProperty( "senderAddress" );
         }
 
+        @Override
         public String getLocalRecipientFile(int num) {
             String fileName = num == 1 ? "localRecipientFile" : "localRecipientFile" + num;
             return this.props.getProperty( fileName );
         }
 
+        @Override
         public List<RecipientField> getFields() {
             List<RecipientField> fields = new ArrayList<RecipientField>();
 
@@ -90,12 +99,6 @@ public final class ConfirmationMailExample {
             }
             return fields;
         }
-
-        public String getScpHost(){return "";}
-        public int getScpPort(){return 0;}
-        public String getScpUsername(){return "";}
-        public String getScpPassword(){return "";}
-        public String getScpDirectory(){return "";}
     }//class PropertiesClientConfig
 
     // members
