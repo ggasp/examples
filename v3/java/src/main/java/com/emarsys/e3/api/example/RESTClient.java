@@ -61,16 +61,30 @@ final class RESTClient {
     }
 
     /**
-     * Performs an HTTP POST request.
+     * Performs an HTTP POST request with XML data.
      *
      * @param url
      * @param xmlContent
      * @return
      * @throws IOException
      */
-    Response doPost(String url, String xmlContent) throws IOException {
+    Response doPostXML(String url, String xmlContent) throws IOException {
+        return doPost( url, xmlContent, MediaType.APPLICATION_XML );
+    }
+
+    /**
+     * Performs an HTTP POST request using the specified media type.
+     *
+     * @param url The target URL
+     * @param content The content which shall be sent
+     * @param mediaType The desired media type
+     * @return
+     * @throws IOException
+     */
+    Response doPost(String url, String content, MediaType mediaType ) throws IOException {
         return doRequest(new Request(Method.POST, url,
-                new StringRepresentation(xmlContent, MediaType.APPLICATION_XML)));
+                new StringRepresentation(content, mediaType))
+        );
     }
 
     /**
@@ -81,7 +95,7 @@ final class RESTClient {
      * @return
      * @throws IOException
      */
-    Response doPut(String url, String xmlContent) throws IOException {
+    Response doPutXML(String url, String xmlContent) throws IOException {
         return doRequest(new Request(Method.PUT, url,
                 new StringRepresentation(xmlContent, MediaType.APPLICATION_XML)));
     }

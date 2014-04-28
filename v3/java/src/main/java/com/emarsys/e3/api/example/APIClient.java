@@ -7,30 +7,24 @@ import java.io.StringReader;
 
 
 import org.restlet.Response;
+import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import org.w3c.dom.Document;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
-import java.beans.XMLDecoder;
 import java.io.IOException;
-import java.io.StringReader;
 
-import java.lang.Object;
 import java.lang.String;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import static java.lang.System.out;
@@ -90,7 +84,7 @@ public class APIClient {
             this.createMissingRecipientFields();
 
             String requestURL = this.config.getApiBaseURL() + "batch_mailings/" + name;
-            Response response = this.restClient.doPost(
+            Response response = this.restClient.doPostXML(
                 requestURL,
                 XMLRequests.createBatchMailingRequest(name, this.config.getLinkDomain())
             );
@@ -125,9 +119,9 @@ public class APIClient {
                 fields += "<field name=\"" + recipientField.getName() + "\"/>";
             }
 
-            Response response = this.restClient.doPost(
+            Response response = this.restClient.doPostXML(
                 requestURL,
-                XMLRequests.createTransactionalMailingRequest( name, this.config.getLinkDomain(), fields )
+                XMLRequests.createTransactionalMailingRequest(name, this.config.getLinkDomain(), fields)
             );
 
             if ( Status.SUCCESS_OK.equals( response.getStatus() ) ) {
@@ -148,7 +142,7 @@ public class APIClient {
     public int createRevision(String mailingID) throws APIException {
         try {
             String requestURL = getTransactionalMailingURL( mailingID ) + "/revisions";
-            Response response = this.restClient.doPost( requestURL, "" );
+            Response response = this.restClient.doPostXML(requestURL, "");
             String xml = response.getEntity().getText();
             NodeList nodes = parseXml( xml, "//revision/@id" );
 
@@ -287,7 +281,7 @@ public class APIClient {
     public void finishBatchRecipients( String name ) throws APIException, IOException {
 
         String requestURL = getBatchMailingURL( name ) + "/recipients/status?status=Finished";
-        Response response = this.restClient.doPost( requestURL, "" );
+        Response response = this.restClient.doPostXML(requestURL, "");
         if( Status.SUCCESS_OK.equals( response.getStatus() ) ) {
             out.println( "Finished the recipient list.");
         }
@@ -302,7 +296,7 @@ public class APIClient {
     private void postRecipients( String requestURL, String name, File recipientFile ) throws APIException, IOException {
 
         String recipients = getRecipients( recipientFile );
-        Response response = this.restClient.doPost( requestURL, recipients );
+        Response response = this.restClient.doPost(requestURL, recipients, MediaType.TEXT_CSV);
 
         if( Status.SUCCESS_OK.equals( response.getStatus() ) ) {
             out.println( "Posted recipients:");
@@ -333,9 +327,9 @@ public class APIClient {
      */
     private void addField(String name, String type) throws APIException {
         try {
-            Response response = this.restClient.doPost(
-                    this.fieldRequestURL,
-                    XMLRequests.addFieldRequest(name, type)
+            Response response = this.restClient.doPostXML(
+                this.fieldRequestURL,
+                XMLRequests.addFieldRequest(name, type)
             );
 
             if (Status.SUCCESS_OK.equals(response.getStatus())) {
@@ -355,9 +349,9 @@ public class APIClient {
      */
     private void addSender() throws APIException {
         try {
-            Response response = this.restClient.doPut(
-                    this.senderRequestURL + "/" + this.config.getSenderId(),
-                    XMLRequests.addSenderRequest(this.config.getSenderName(), this.config.getSenderAddress())
+            Response response = this.restClient.doPutXML(
+                this.senderRequestURL + "/" + this.config.getSenderId(),
+                XMLRequests.addSenderRequest(this.config.getSenderName(), this.config.getSenderAddress())
             );
 
             if (Status.SUCCESS_OK.equals(response.getStatus())) {
