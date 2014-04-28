@@ -264,9 +264,9 @@ final class XMLRequests {
     }
 
     private static final String addFieldXML =
-        "<fields>" +
+        "<recipient_fields>" +
             "<field name=\"{0}\" type=\"{1}\" />" +
-        "</fields>";
+        "</recipient_fields>";
 
     /**
      *
