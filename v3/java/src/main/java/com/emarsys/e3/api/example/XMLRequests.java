@@ -190,7 +190,6 @@ final class XMLRequests {
      * Returns the XML document which forms the body of the HTTP POST request
      * in order to create a mailing as a String.
      *
-     * @param  mailing name
      * @return always a valid XML document as String, never null
      */
 

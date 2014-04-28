@@ -9,19 +9,12 @@ This is a small code example of using the Emarsys API
 
 ## Building The API ##
 
-Run the following code from a console:
+Run the following code from a console to execute the examples (all required dependencies will be downloaded automatically):
 
-1. `./bin/sbt update`
-2. `./bin/sbt run`
-
-The build system (SBT, http://www.scala-sbt.org) will
-download all required dependencies when you call `update`.
-
-When you run `run` you will be asked which example should be run:
+1. `./gradlew runNewsletterExample` (for execution of the newsletter example)
+2. `./gradlew runConfirmationExample` (for execution of the confirmation mail example)
 
 
-`[1] com.emarsys.e3.api.example.ConfirmationMailExample`
-`[2] com.emarsys.e3.api.example.NewsletterExample`
 
 ## Basic Newsletter Example ##
 
@@ -29,13 +22,15 @@ The basic newsletter example creates a batch mailing, sets the run date to 5 min
 
 The program executed can be found in `src/main/scala/com/emarsys/e3/api/NewsletterExample.java`
 
-Refer to config.props in order explore or change the configuration of the client.
+Refer to `config.props` in order explore or change the configuration of the client.
 
 The example creates a simple HTML mail (no plain text content) with a single link and three conditional contents
 (##SUBJECT##, ##HEADER## and ##FOOTER##) and further demos the usage of personalization variables ($$RCPT_DOMAIN$$), too.
 
 The recipients of the generated newletters are stored in `recipients.csv`. You might want to change the email addresses to point to actual mail boxes.
+
 Further you can add fields (aka columns) to the recipient data (you also have to do that in the config.props then).
+
 
 ## Basic Confirmation Mail Example ##
 
@@ -43,9 +38,9 @@ The basic confirmation mail example creates a transactional mailing, publishes i
 
 The program executed can be found in `src/main/scala/com/emarsys/e3/api/ConfirmationMail.java`
 
-Refer to `config.json` in order explore or change the configuration of the client.
+Refer to `config.props` in order explore or change the configuration of the client.
 
 The example creates a simple HTML mail (no plain text content) with a single link and three conditional contents
 (`##SUBJECT##`, `##HEADER##` and `##FOOTER##`) and further demos the usage of personalization variables (`$$RCPT_DOMAIN$$`), too.
 
-The recipients of the generated newletters are stored in `recipients.csv` and `recipients2.csv`. You might want to change the email addresses to point to actual mail boxes.
+The recipients of the generated confirmation mails are stored in `recipients.csv` _and_ `recipients2.csv`. You might want to change the email addresses to point to actual mail boxes.

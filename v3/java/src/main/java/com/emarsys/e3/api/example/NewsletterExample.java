@@ -15,9 +15,7 @@ import static java.lang.System.out;
 
 /**
  * NewsletterExample implements a simple demo client for the emarsys Batch Mailing API.
- * <p/>
- * The actual mail generation and sending process is triggerd in {@link #sendNewsletter()}.
- * <p/>
+ *
  * The configuration of the client is done via the Properties file 'client.props' and
  * the recipient data is read from 'recipients.csv'.
  * <p/>
@@ -25,14 +23,13 @@ import static java.lang.System.out;
  * batch mailing but basically it's solely three action needed:
  * <ol>
  *     <li>create the batch mailing</li>
- *     <li>transfer the recipients import file</li>
- *     <li>trigger import</li>
+ *     <li>transfer the recipients</li>
  * </ol>
  * </p>
  * The NewsletterExample currently does not contain any processing of results, i.e.
  * id does not handle exports. Please refer to the documentation for those kind of use cases.
  *
- * @author Alex Kraml <kraml@emarsys.com>
+ * @author Alexander Kraml <kraml@emarsys.com>
  */
 public final class NewsletterExample {
 
@@ -101,9 +98,8 @@ public final class NewsletterExample {
             }
             return fields;
         }
-    }//class PropertiesClientConfig
+    }
 
-    // members
     private String batchName;
     private ClientConfiguration config;
 
@@ -148,4 +144,4 @@ public final class NewsletterExample {
             System.exit(1);
         }
     }
-}//class NewsletterExample
+}

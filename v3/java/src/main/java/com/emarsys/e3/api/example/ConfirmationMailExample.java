@@ -18,18 +18,8 @@ import static java.lang.System.out;
  *
  * The configuration of the client is done via the Properties file 'client.props' and
  * the recipient data is read from 'recipients.csv' and 'recipients2.csv'.
- * <p/>
- * See {@link ConfirmationMailing} for the detailed logic needed in order to set up and trigger a
- * batch mailing but basically it's solely three action needed:
- * <ol>
- *     <li>create the mailing</li>
- *     <li>post the recipients for sending</li>
- * </ol>
- * </p>
- * The ConfirmationMailExample currently does not contain any processing of results, i.e.
- * id does not handle exports. Please refer to the documentation for those kind of use cases.
  *
- * @author Alex Kraml <kraml@emarsys.com>
+ * @author Alexander Kraml <kraml@emarsys.com>
  */
 public final class ConfirmationMailExample {
 
@@ -154,4 +144,4 @@ public final class ConfirmationMailExample {
             System.exit(1);
         }
     }
-}//class ConfirmationMailExample
+}

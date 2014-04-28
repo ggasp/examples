@@ -1,6 +1,6 @@
 package com.emarsys.e3.api.example;
 
-import org.restlet.data.Response;
+import org.restlet.Response;
 import org.restlet.data.Status;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -19,6 +19,7 @@ import javax.xml.xpath.XPathFactory;
 import java.beans.XMLDecoder;
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.File;
 
 import java.lang.Object;
 import java.lang.String;
@@ -32,16 +33,10 @@ import static java.lang.System.out;
 /**
  * BatchMailing forms the primary entry point to the emarsys API.
  * <p/>
- * The BatchMailing is a wrapper around the HTTP and SFTP requests
+ * The BatchMailing is a wrapper around the HTTP requests
  * needed in order to communicate with the API.
  * <p/>
- * Currently the following functions are supported:
- * <ol>
- *     <li>{@link #create() create the batch mailing}</li>
- *     <li>{@link #transferRecipientData()}  transfer the recipients import file}</li>
- *     <li>{@link #triggerImport() trigger import}</li>
- * </ol>
- * <p/>
+ *
  * @author Michael Kulovits <kulovits@emarsys.com>
  */
 public class BatchMailing {
@@ -84,7 +79,7 @@ public class BatchMailing {
      * @throws IOException
      */
     public void transferRecipientList(String recipientFile) throws APIException, IOException {
-        apiClient.postBatchRecipients( this.name, recipientFile );
+        apiClient.postBatchRecipients( this.name, new File( recipientFile ) );
     }
 
     /**

@@ -6,7 +6,7 @@ import java.io.FileReader;
 import java.io.StringReader;
 
 
-import org.restlet.data.Response;
+import org.restlet.Response;
 import org.restlet.data.Status;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -38,15 +38,8 @@ import static java.lang.System.out;
 /**
  * BatchMailing forms the primary entry point to the emarsys API.
  * <p/>
- * The BatchMailing is a wrapper around the HTTP and SFTP requests
+ * The BatchMailing is a wrapper around the HTTP requests
  * needed in order to communicate with the API.
- * <p/>
- * Currently the following functions are supported:
- * <ol>
- *     <li>{@link #create() create the batch mailing}</li>
- *     <li>{@link #transferRecipientData()}  transfer the recipients import file}</li>
- *     <li>{@link #triggerImport() trigger import}</li>
- * </ol>
  * <p/>
  * @author Michael Kulovits <kulovits@emarsys.com>
  */
@@ -66,13 +59,12 @@ public class APIClient {
     /**
      * Constructor.
      *
-     * @param name   - the unique id of the batch mailing
      * @param config - the config
      */
     public APIClient(ClientConfiguration config) {
 
         this.config = config;
-        this.fieldRequestURL = this.config.getApiBaseURL() + "fields";
+        this.fieldRequestURL = this.config.getApiBaseURL() + "recipient_fields";
         this.senderRequestURL = this.config.getApiBaseURL() + "senders";
         this.restClient = new RESTClient(config);
     }
@@ -199,7 +191,7 @@ public class APIClient {
     /**
      * Loads all fields currently in the account into the class via an API call.
      *
-     * @throws BMAPIException
+     * @throws APIException
      */
     private List<String> loadAvailableFields() throws APIException {
         List<String> availableFields = new ArrayList<String>();
@@ -267,7 +259,6 @@ public class APIClient {
         postRecipients( 
             getTransactionalMailingURL( name ) + "/revisions/" + revision + "/recipients",
             name,
-            revision,
             recipientFile
         );
     }
@@ -283,7 +274,6 @@ public class APIClient {
         postRecipients( 
             getBatchMailingURL( name ) + "/recipients",
             name,
-            revision,
             recipientFile
         );
     }
@@ -296,7 +286,7 @@ public class APIClient {
      */
     public void finishBatchRecipients( String name ) throws APIException, IOException {
 
-        String requestURL = getBatchMailingURL( name ) + "/recipients/status?status=FINISHED"
+        String requestURL = getBatchMailingURL( name ) + "/recipients/status?status=Finished";
         Response response = this.restClient.doPost( requestURL, "" );
         if( Status.SUCCESS_OK.equals( response.getStatus() ) ) {
             out.println( "Finished the recipient list.");
@@ -309,7 +299,7 @@ public class APIClient {
      * @throws APIException
      * @throws IOException
      */
-    private void postRecipients( String requestURL, String name, int revision, File recipientFile ) throws APIException, IOException {
+    private void postRecipients( String requestURL, String name, File recipientFile ) throws APIException, IOException {
 
         String recipients = getRecipients( recipientFile );
         Response response = this.restClient.doPost( requestURL, recipients );

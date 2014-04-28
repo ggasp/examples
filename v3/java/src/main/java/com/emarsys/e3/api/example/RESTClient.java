@@ -9,10 +9,10 @@ import org.restlet.data.ChallengeScheme;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Protocol;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.data.Status;
-import org.restlet.resource.StringRepresentation;
+import org.restlet.representation.StringRepresentation;
 
 import static java.lang.System.err;
 import static java.lang.System.out;

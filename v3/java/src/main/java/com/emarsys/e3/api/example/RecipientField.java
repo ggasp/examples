@@ -1,5 +1,8 @@
 package com.emarsys.e3.api.example;
 
+/**
+ * A simple helper class representing a recipient related field.
+ */
 public class RecipientField {
     private String name;
     private String type = "TEXT";

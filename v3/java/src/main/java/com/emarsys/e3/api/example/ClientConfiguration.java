@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Provides the necessary information for establishment of a connection to the emarsys API.
  *
- * @author Alex Kraml <kraml@emarsys.com>
+ * @author Alexander Kraml <kraml@emarsys.com>
  */
 public interface ClientConfiguration {
 

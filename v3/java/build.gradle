@@ -1,0 +1,33 @@
+version = '1.0.0'
+description = 'Java API Example'
+
+apply plugin: 'java'
+apply plugin: 'idea'
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.11'
+}
+
+task(runNewsletterExample, dependsOn: 'classes', type: JavaExec) {
+    main = 'com.emarsys.e3.api.example.NewsletterExample'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+task(runConfirmationExample, dependsOn: 'classes', type: JavaExec) {
+    main = 'com.emarsys.e3.api.example.ConfirmationMailExample'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url "http://maven.restlet.org/"
+    }
+}
+
+dependencies {
+    compile 'commons-lang:commons-lang:2.6'
+    compile 'joda-time:joda-time:2.3'
+    compile 'org.restlet.jee:org.restlet:2.2.0'
+    compile 'org.restlet.jee:org.restlet.ext.httpclient:2.2.0'
+}

@@ -1,6 +1,6 @@
 package com.emarsys.e3.api.example;
 
-import org.restlet.data.Response;
+import org.restlet.Response;
 import org.restlet.data.Status;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -48,8 +48,7 @@ public class TransactionalMailing {
     private final String name;
     private final APIClient apiClient;
     private int revision = -1;
-    private boolean created = false;
-    
+
     /**
      * Constructor.
      *
@@ -88,7 +87,7 @@ public class TransactionalMailing {
         else {
             try {
 
-                apiClient.postRecipients(name, revision, new File( recipientFile ));
+                apiClient.postTransactionalRecipients(name, revision, new File( recipientFile ));
 
             } catch( FileNotFoundException fe ) {
 
