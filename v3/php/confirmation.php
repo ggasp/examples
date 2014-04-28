@@ -51,7 +51,7 @@ class confirmation {
 
 
         $xml = "
-            <mailing>
+            <transactional_mailing>
                 <!-- These properties can be defaulted on the account, and do not need to be specified each time. -->
                 <properties>
                     <property key=\"Sender\">default</property>
@@ -62,63 +62,63 @@ class confirmation {
                     <property key=\"IncludeHeader\">false</property>
                 </properties>
                 <!-- The specification of the recipient fields is mandatory. -->
-                <recipientFields>
+                <recipient_fields>
                     <field name=\"EMAIL\"/>
-                    <field name=\"RCPT_TYPE_v2\"/>
-                    <field name=\"LANGUAGE_v2\"/>
-                </recipientFields>
+                    <field name=\"RCPT_TYPE_v3\"/>
+                    <field name=\"LANGUAGE_v3\"/>
+                </recipient_fields>
                 <subject>Emarsys TXM API Test (##SUBJECT##)</subject>
                 <html>
                     <![CDATA[".self::$html_content."]]>
                 </html>
-                <conditions>
-                    <condition id=\"HEADER\">
+                <conditional_contents>
+                    <conditional_content id=\"HEADER\">
                         <cases>
                             <case>
-                                <when><![CDATA[(LANGUAGE_v2 = \"en\") and (not(RCPT_TYPE_v2 in (1,2,3,4)))]]></when>
+                                <when><![CDATA[(LANGUAGE_v3 = \"en\") and (not(RCPT_TYPE_v3 in (1,2,3,4)))]]></when>
                                 <html><![CDATA[".self::$header1."]]></html>
                             </case>
                             <case>
-                                <when><![CDATA[(LANGUAGE_v2 = \"de\") and (RCPT_TYPE_v2 in (1,2,3,4))]]></when>
+                                <when><![CDATA[(LANGUAGE_v3 = \"de\") and (RCPT_TYPE_v3 in (1,2,3,4))]]></when>
                                 <html><![CDATA[".self::$header2."]]></html>
                             </case>
                         </cases>
                         <otherwise>
                             <html><![CDATA[".self::$otherHeader."]]></html>
                         </otherwise>
-                    </condition>
-                    <condition id=\"FOOTER\">
+                    </conditional_content>
+                    <conditional_content id=\"FOOTER\">
                         <cases>
                             <case>
-                                <when><![CDATA[(LANGUAGE_v2 contains \"n\") and (RCPT_TYPE_v2 < 1)]]></when>
+                                <when><![CDATA[(LANGUAGE_v3 contains \"n\") and (RCPT_TYPE_v3 < 1)]]></when>
                                 <html><![CDATA[".self::$footer1."]]></html>
                             </case>
                             <case>
-                                <when><![CDATA[(LANGUAGE_v2 contains \"d\") and (RCPT_TYPE_v2 > 1)]]></when>
+                                <when><![CDATA[(LANGUAGE_v3 contains \"d\") and (RCPT_TYPE_v3 > 1)]]></when>
                                 <html><![CDATA[".self::$footer2."]]></html>
                             </case>
                         </cases>
                         <otherwise>
                             <html><![CDATA[".self::$otherFooter."]]></html>
                         </otherwise>
-                    </condition>
-                    <condition id=\"SUBJECT\">
+                    </conditional_content>
+                    <conditional_content id=\"SUBJECT\">
                         <cases>
                             <case>
-                                <when><![CDATA[(RCPT_TYPE_v2 equals 0)]]></when>
+                                <when><![CDATA[(RCPT_TYPE_v3 equals 0)]]></when>
                                 <text><![CDATA[".self::$subject1."]]></text>
                             </case>
                             <case>
-                                <when><![CDATA[(RCPT_TYPE_v2 equals 4)]]></when>
+                                <when><![CDATA[(RCPT_TYPE_v3 equals 4)]]></when>
                                 <text><![CDATA[".self::$subject2."]]></text>
                             </case>
                         </cases>
                         <otherwise>
                             <text><![CDATA[".self::$otherSubject."]]></text>
                         </otherwise>
-                    </condition>
-                </conditions>
-            </mailing>
+                    </conditional_content>
+                </conditional_contents>
+            </transactional_mailing>
             ";
 
         return $xml;
@@ -126,9 +126,9 @@ class confirmation {
 
     public static function fieldXML ( $name, $type ) {
         $xml = "
-            <fields>
+            <recipient_fields>
                 <field name=\"$name\" type=\"$type\" />
-            </fields>
+            </recipient_fields>
             ";
 
         return $xml;

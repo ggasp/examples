@@ -38,8 +38,8 @@
         function __construct( $mailing_id, $api_config ) {
             $this->_mailing_id = $mailing_id;
             $this->_config = $api_config;
-            $this->_v2_base_url = $this->_config->apiBaseUrl;
-            $this->_mailings_base_url = "$this->_v2_base_url/transactional_mailings";
+            $this->_base_url = $this->_config->apiBaseUrl;
+            $this->_mailings_base_url = "$this->_base_url/transactional_mailings";
             $this->_restclient = new RESTClient( $this->_config->apiUsername, $this->_config->apiPasswordHash );
         }
 
@@ -116,7 +116,7 @@
          */
         private function loadAvailableFields() {
 
-            $xml = $this->_restclient->doGet( $this->_v2_base_url.'/fields' );
+            $xml = $this->_restclient->doGet( $this->_base_url.'/recipient_fields' );
 
             //convert the output to a SimpleXML
             $xml = new SimpleXMLElement( $xml );
@@ -136,7 +136,7 @@
          */
         private function addField( $name, $type = 'text' ) {
             $xml = XmlRequests::fieldXML( $name, $type );
-            $this->_restclient->DoPost( $this->_v2_base_url.'/fields', $xml );
+            $this->_restclient->DoPost( $this->_base_url.'/recipient_fields', $xml );
             echo "Created Field '".$name."'".PHP_EOL;
         }
 
@@ -154,7 +154,7 @@
          * Loads all the senders currently available for the account
          */
         private function loadAvailableSenders() {
-            $xml = $this->_restclient->doGet( $this->_v2_base_url.'/senders' );
+            $xml = $this->_restclient->doGet( $this->_base_url.'/senders' );
 
             //convert the output to a SimpleXMl
             $xml = new SimpleXMLElement( $xml);
@@ -175,7 +175,7 @@
          */
         private function addSender( $senderId) {
             $xml = XmlRequests::senderXML( $this->_config->senderName, $this->_config->senderAddress );
-            $this->_restclient->doPut( $this->_v2_base_url.'/senders/'.$senderId, $xml );
+            $this->_restclient->doPut( $this->_base_url.'/senders/'.$senderId, $xml );
             echo "Created sender '".$senderId."'".PHP_EOL;
         }
 

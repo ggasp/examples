@@ -68,7 +68,9 @@
 
             //init cURL in PHP
             $curl = curl_init( $url );
-            curl_setopt( $curl, CURLOPT_SSL_VERIFYPEER, true );
+            // do not accept outdated/invalid certificates and invalid host names
+            curl_setopt( $curl, CURLOPT_SSL_VERIFYPEER, false );
+            curl_setopt( $curl, CURLOPT_SSL_VERIFYHOST, false );
 
             // set the method
             switch ( $method )
@@ -89,6 +91,12 @@
 
                 //ask for an xmpl format
                 curl_setopt ( $curl, CURLOPT_HTTPHEADER, Array( "Content-Type: application/xml" ) );
+            }
+            else {
+                if ( $method != 'GET' ) {
+                    curl_setopt ( $curl, CURLOPT_POSTFIELDS, "" );
+                    curl_setopt ( $curl, CURLOPT_HTTPHEADER, Array( "Content-Type: text/plain" ) );
+                }
             }
 
             // username and password

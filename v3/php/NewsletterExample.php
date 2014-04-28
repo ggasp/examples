@@ -16,8 +16,8 @@
      * 	1. Check for Recipient Fields, see createMissingRecipientFields()
      *  2. Check for Senders, see createMissingSenders()
      *  3. Create the BatchMailing via an HTTP POST request, see create()
-     *  4. Transfer the recipients CSV file to the remote SFTP share, see transferRecipientData()
-     *	5. Trigger the import (and thus subsequently also the sending) of the batch, see triggerImport()
+     *  4. Transfer the recipients via a POST request, see transferRecipientData()
+     *	5. Finish the recipient list by changing the status of the recipients to Finished, see finishRecipientData
      *
      * All the other features of the BMAPI are not part of this example code.
      */
@@ -56,42 +56,43 @@
             $this->createMissingRecipientFields();
 
             $xml = newsletter::xml( $this->_batch_name, $this->_config->linkDomain);
-            $this->_restclient->doPost( $this->_base_url.'/batches/'.$this->_batch_name, $xml);
+            $this->_restclient->doPost( $this->_base_url.'/batch_mailings/'.$this->_batch_name, $xml);
             echo "Created batch mailing '".$this->_batch_name."'".PHP_EOL;
         }
 
         /*
-         * Trigger the import of this batch mailing.
-         */
-        function triggerImport() {
-
-            $this->_restclient->doPost(
-                $this->_base_url.'/batches/'.$this->_batch_name.'/import',
-                newsletter::importXML( $this->_remoteFile )
-            );
-
-            echo "Triggered import for file '".$this->_remoteFile."'".PHP_EOL;
-        }
-
-        /*
-         * Transferes the recipients' file to the remote SFTP share.
-         *
-         * The implementation uses 'phpseclib' which is part of the example code,
-         * see the corresponding subfolder where you'll find the code as well
-         * as some documentation. For further details you might visit:
-         *   http://phpseclib.sourceforge.net/
+         * Transferes the recipients' via a POST request.
          */
         function transferRecipientData() {
 
-            $transfer = new NewsletterRecipientDataTransferer( $this->_config );
-            $transfer->login();
+            $recipientsPath = $this->_base_url.'/batch_mailings/'.$this->_batch_name."/recipients";
+            $recipients = file_get_contents( $this->_config->localRecipientFile );
 
-            // copy the recipientFile to SFTP share
-            $transfer->put( $this->_remoteFile );
+            echo "Transferring recipients:".PHP_EOL;
+            echo $recipients.PHP_EOL;
 
-            echo "Transfered '".$this->_config->localRecipientFile."' to '"
-                .$this->_remoteFile."'".PHP_EOL;
+            $sendResult = $this->_restclient->doPost(
+                $recipientsPath, $recipients
+            );
+
+            echo "Recipient Transfer Result:".PHP_EOL;
+            echo "'".$sendResult."'".PHP_EOL;
         }
+
+
+        /*
+         * Add a new field to the account.
+         */
+        function finishRecipientData() {
+
+            $recipientsStatusPath = $this->_base_url.'/batch_mailings/'.$this->_batch_name."/recipients/status?status=Finished";
+            
+            $sendResult = $this->_restclient->doPost( $recipientsStatusPath, "" );
+
+            echo "Status of recipients set to 'Finished' with result:".PHP_EOL;
+            echo "'".$sendResult."'".PHP_EOL;
+        }
+
 
         /*
          * Verifies if all fields exist, if not, creates it
@@ -120,7 +121,7 @@
          */
         private function loadAvailableFields() {
 
-            $xml = $this->_restclient->doGet( $this->_base_url.'/fields' );
+            $xml = $this->_restclient->doGet( $this->_base_url.'/recipient_fields' );
 
             //convert the output to a SimpleXML
             $xml = new SimpleXMLElement( $xml );
@@ -141,7 +142,7 @@
         private function addField( $name, $type = 'text' ) {
 
             $xml = newsletter::fieldXML( $name, $type );
-            $this->_restclient->DoPost( $this->_base_url.'/fields', $xml );
+            $this->_restclient->DoPost( $this->_base_url.'/recipient_fields', $xml );
             echo "Created Field '".$name."'".PHP_EOL;
         }
 
@@ -202,10 +203,10 @@
     // Create the batch mailing
     $batchMailing->create();
 
-    // Copy recipient file via SFTP
+    // POST the recipients
     $batchMailing->transferRecipientData();
 
-    // Trigger import (and subsequently the launch) of the copied file
-    $batchMailing->triggerImport();
+    // Finish the recipients
+    $batchMailing->finishRecipientData();
 
 ?>
