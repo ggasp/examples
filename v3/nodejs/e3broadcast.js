@@ -14,7 +14,7 @@ exports.createAPI=function(config_filename){
 
 exports.createBatchMailing=function(callback,batchMailingXml,id){
    batchMailingXml=batchMailingXml.replace(/{domain}/,config.domain);
-   makeAuthPostRequest("batches/"+id,batchMailingXml,function(err,result) {
+   makeAuthPostRequest("batch_mailings/"+id,batchMailingXml,function(err,result) {
        if (err) {
            callback(err);
        } else {
@@ -40,19 +40,28 @@ exports.preview=function (callback,xml ,email, fields){
     });
 };
 
-exports.transferRecipientData=function(callback,filename){
-    sftpUpload(filename,".",callback);
-};
+exports.addRecipients=function(callback,recipientsCsv){
+    makeAuthPostRequest("batch_mailings/"+mailingId+"/recipients",recipientsCsv,function(err,result) {
+        if (err) {
+            callback(err);
+        } else {
+            callback(null);
+        }
+    });
+}
 
-exports.triggerImport=function(callback,mailingName,filename){
-    var root = xmlbuilder.create('importRequest');
-    root.ele("filePath",filename);
-    var xml=root.end({pretty:true});
-    makeAuthPostRequest("batches/"+mailingName+"/import",xml,callback);
-};
+exports.finishRecipients=function(callback){
+    makeAuthPostRequest("batch_mailings/"+mailingId+"/recipients/status?status=Finished","",function (err,result) {
+        if (err) {
+            callback(err);
+        } else {
+            callback(result);
+        }
+    });    
+}
 
 exports.getStatus=function(callback,mailingId){
-    makeAuthGetRequest("batches/"+mailingId+"/status",callback);
+    makeAuthGetRequest("batch_mailings/"+mailingId+"/status",callback);
 };
 
 exports.createTransactionalMailing=function(callback,mailingXml,mailingId){
@@ -158,33 +167,3 @@ function makeAuthPutRequest(path,body,callback) {
         }
     );
 }
-
-// sftp uploader
-function sftpUpload(filename,directory,callback) {
-    var c = new sshConnection();
-    c.on('connect', function() { });
-    c.on('ready', function() {
-        c.sftp(function(err, sftp) {
-            if (err) {
-                callback(err);
-            }
-
-            sftp.fastPut(filename, "./"+directory+"/"+filename,function(err) {
-                log("SFTP:"+directory+"/"+filename+" ERR:"+err);
-                callback(err);
-            });
-        });
-    });
-    c.on('error', function(err) {
-        log("SFTP ERR:"+err);
-        callback(err,"");
-    });
-    c.on('end', function() {});
-    c.on('close', function(had_error) {});
-    c.connect({
-        host: config.scp_host,
-        port: config.scp_port,
-        username: config.scp_username,
-        password: config.scp_password
-    });
-};

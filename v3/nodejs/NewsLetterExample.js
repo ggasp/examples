@@ -16,6 +16,7 @@ var runDate=dateformat(new Date(),"yyyy-mm-dd'T'HH:MM:sso");
 var batchMailingXml=fs.readFileSync("newsletter.xml",{encoding:"utf8"});
 batchMailingXml=batchMailingXml.replace(/\{rundate\}/,runDate);
 var mailingID="NL01";
+var recipients1=fs.readFileSync("recipients.csv",{encoding:"utf8"});
 
 async.waterfall([
 //    function (callback) {
@@ -28,12 +29,12 @@ async.waterfall([
         client.createBatchMailing(callback,batchMailingXml,mailingID);
     },
     function (result,callback) {
-        log("uploading recipients");
-        client.transferRecipientData(callback,'recipients.csv');
+        log("adding recipients to recipient list");
+        client.addRecipients(callback,recipients1);
     },
-    function (callback) {
-        log("triggering import");
-        client.triggerImport(callback,mailingID,'recipients.csv');
+    function (result,callback) {
+        log("finish recipient list");
+        client.finishRecipients(callback);
     }
 ], function(err,result) {
     if (err) {
