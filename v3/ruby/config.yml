@@ -2,7 +2,7 @@
 apiUsername: <username>
 apiPasswordHash: <password hash>
 apiHost: <emarsys API URL>
-apiBase: /v2/
+apiBase: /v3/
 linkDomain: <domain>
 
 # Sender data
@@ -10,15 +10,8 @@ senderId: <default>
 senderName: <sender name>
 senderAddress: <sender e-mail address>
 
-# SFTP data
-scpHost: <emarsys SFTP URL>
-scpPort: <port>
-scpUsername: <SFTP user name>
-scpPassword: <SFTP password>
-scpDirectory: /home/<SFTP user name>
-
 # Path to the recipient file
 localRecipientFile:  ./recipients.csv
 localRecipientFile2: ./recipients2.csv
 
-fields: [[EMAIL], [RCPT_TYPE_v2, numeric], [LANGUAGE_v2, text]]
+fields: [[EMAIL], [RCPT_TYPE_v3, numeric], [LANGUAGE_v3, text]]

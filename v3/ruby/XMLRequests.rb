@@ -9,10 +9,10 @@ class XmlRequests
   def batch_xml
     xml = Builder::XmlMarkup.new
 
-    xml.batch {
+    xml.batch_mailing {
       xml.name @name
       # Schedule to run in 5 minutes
-      xml.runDate @time
+      xml.start_date @time
       xml.properties {
         xml.property("key" => "Sender") { xml.text! "default" }
         xml.property("key" => "Language") { xml.text! "en" }
@@ -22,15 +22,15 @@ class XmlRequests
       }
       xml.subject subjectContent
       xml.html htmlContent
-      xml.conditions {
-        xml.condition("id" => "HEADER") {
+      xml.conditional_contents {
+        xml.conditional_content("id" => "HEADER") {
           xml.cases {
             xml.case {
-              xml.when "(LANGUAGE_v2 = \"en\") and (not(RCPT_TYPE_v2 in (1,2,3,4)))"
+              xml.when "(LANGUAGE_v3 = \"en\") and (not(RCPT_TYPE_v3 in (1,2,3,4)))"
               xml.html emarsysHeader
             }
             xml.case {
-              xml.when "(LANGUAGE_v2 = \"de\") and (RCPT_TYPE_v2 in (1,2,3,4))"
+              xml.when "(LANGUAGE_v3 = \"de\") and (RCPT_TYPE_v3 in (1,2,3,4))"
               xml.html exampleHeader
             }
           }
@@ -38,14 +38,14 @@ class XmlRequests
             xml.html otherwiseHeader
           }
         }
-        xml.condition("id"=>"FOOTER") {
+        xml.conditional_content("id"=>"FOOTER") {
           xml.cases {
             xml.case {
-              xml.when "(LANGUAGE_v2 contains \"n\") and (RCPT_TYPE_v2 < 1)"
+              xml.when "(LANGUAGE_v3 contains \"n\") and (RCPT_TYPE_v3 < 1)"
               xml.html emarsysFooter
             }
             xml.case {
-              xml.when "(LANGUAGE_v2 contains \"d\") and (RCPT_TYPE_v2 > 1)"
+              xml.when "(LANGUAGE_v3 contains \"d\") and (RCPT_TYPE_v3 > 1)"
               xml.html exampleFooter
             }
           }
@@ -53,14 +53,14 @@ class XmlRequests
             xml.html otherwiseFooter
           }
         }
-        xml.condition("id"=>"SUBJECT") {
+        xml.conditional_content("id"=>"SUBJECT") {
           xml.cases {
             xml.case {
-              xml.when "(RCPT_TYPE_v2 equals 0)"
+              xml.when "(RCPT_TYPE_v3 equals 0)"
               xml.text emarsysSubject
             }
             xml.case {
-              xml.when "(RCPT_TYPE_v2 equals 4)"
+              xml.when "(RCPT_TYPE_v3 equals 4)"
               xml.text exampleSubject
             }
           }
@@ -76,7 +76,7 @@ class XmlRequests
   def transactional_xml
     xml = Builder::XmlMarkup.new
 
-    xml.mailing {
+    xml.transactional_mailing {
       xml.name @name
       # These properties can be defaulted on the account, and do not need to be specified each time.
       xml.properties {
@@ -87,22 +87,22 @@ class XmlRequests
         xml.property("key" => "IncludeHeader") { xml.text! "false" }
       }
       # The specification of the recipient fields is mandatory.
-      xml.recipientFields {
+      xml.recipient_fields {
         xml.field("name" => "EMAIL")
-        xml.field("name" => "RCPT_TYPE_v2")
-        xml.field("name" => "LANGUAGE_v2")
+        xml.field("name" => "RCPT_TYPE_v3")
+        xml.field("name" => "LANGUAGE_v3")
       }
       xml.subject subjectContent
       xml.html htmlContent
-      xml.conditions {
-        xml.condition("id" => "HEADER") {
+      xml.conditional_contents {
+        xml.conditional_content("id" => "HEADER") {
           xml.cases {
             xml.case {
-              xml.when "(LANGUAGE_v2 = \"en\") and (not(RCPT_TYPE_v2 in (1,2,3,4)))"
+              xml.when "(LANGUAGE_v3 = \"en\") and (not(RCPT_TYPE_v3 in (1,2,3,4)))"
               xml.html emarsysHeader
             }
             xml.case {
-              xml.when "(LANGUAGE_v2 = \"de\") and (RCPT_TYPE_v2 in (1,2,3,4))"
+              xml.when "(LANGUAGE_v3 = \"de\") and (RCPT_TYPE_v3 in (1,2,3,4))"
               xml.html exampleHeader
             }
           }
@@ -110,14 +110,14 @@ class XmlRequests
             xml.html otherwiseHeader
           }
         }
-        xml.condition("id"=>"FOOTER") {
+        xml.conditional_content("id"=>"FOOTER") {
           xml.cases {
             xml.case {
-              xml.when "(LANGUAGE_v2 contains \"n\") and (RCPT_TYPE_v2 < 1)"
+              xml.when "(LANGUAGE_v3 contains \"n\") and (RCPT_TYPE_v3 < 1)"
               xml.html emarsysFooter
             }
             xml.case {
-              xml.when "(LANGUAGE_v2 contains \"d\") and (RCPT_TYPE_v2 > 1)"
+              xml.when "(LANGUAGE_v3 contains \"d\") and (RCPT_TYPE_v3 > 1)"
               xml.html exampleFooter
             }
           }
@@ -125,14 +125,14 @@ class XmlRequests
             xml.html otherwiseFooter
           }
         }
-        xml.condition("id"=>"SUBJECT") {
+        xml.conditional_content("id"=>"SUBJECT") {
           xml.cases {
             xml.case {
-              xml.when "(RCPT_TYPE_v2 equals 0)"
+              xml.when "(RCPT_TYPE_v3 equals 0)"
               xml.text emarsysSubject
             }
             xml.case {
-              xml.when "(RCPT_TYPE_v2 equals 4)"
+              xml.when "(RCPT_TYPE_v3 equals 4)"
               xml.text exampleSubject
             }
           }
@@ -142,14 +142,6 @@ class XmlRequests
         }
 
       }
-    }
-  end
-
-  def import_xml
-    xml = Builder::XmlMarkup.new
-
-    xml.importRequest {
-        xml.filePath @name
     }
   end
 
@@ -165,7 +157,7 @@ class XmlRequests
   def field_xml(name, type)
     xml = Builder::XmlMarkup.new
 
-    xml.fields {
+    xml.recipient_fields {
         xml.field("name" => name, "type" => type)
     }
   end

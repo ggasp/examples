@@ -7,8 +7,7 @@ broadcasting system.
 ## Requirements ##
 
 1. Ruby >= 1.8.7
-2. net-sftp (gem install net-sftp)
-3. builder (gem install builder)
+2. builder (gem install builder)
 
 ## Newsletter Example ##
 

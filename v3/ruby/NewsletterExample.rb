@@ -1,4 +1,4 @@
-require 'APIClient.rb'
+require './APIClient.rb'
 
 #load config
 config = YAML.load_file("config.yml")
@@ -8,8 +8,8 @@ batchMailing = APIClient.new(config, "BatchMailExample")
 # Create the batch
 batchMailing.createBatchMailing
 
-# Transfer the file to be imported
-batchMailing.transferRecipientData
+# Add some recipients to the recipient list
+batchMailing.addRecipients(config["localRecipientFile"])
 
-# Trigger the import
-batchMailing.triggerImport
+# Finish the recipient list
+batchMailing.finishRecipients

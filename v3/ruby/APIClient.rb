@@ -2,9 +2,8 @@ require 'rubygems'
 require 'yaml'
 require 'builder'
 require 'net/https'
-require 'net/sftp'
-require 'XMLRequests.rb'
-require 'RESTClient.rb'
+require './XMLRequests.rb'
+require './RESTClient.rb'
 
 # Little workaround to prevent ssl to send a warning every time
 # is not needed for the api!
@@ -37,30 +36,29 @@ class APIClient
   end
 
   def createBatchMailing
+    puts "creating batch mailing"
     createMissingRequirements
 
     # Create the Batch via API request
-    @restClient.doPost("batches/#{mailing_id}", @XmlRequests.batch_xml)
+    @restClient.doPost("batch_mailings/#{mailing_id}", @XmlRequests.batch_xml)
   end
 
   def createTransactionalMailing
     createMissingRequirements
-
     # Create the Batch via API request
     @restClient.doPost("transactional_mailings/#{mailing_id}", @XmlRequests.transactional_xml)
   end
 
-  # Transfers a file to the SFTP, which is need for a batch to import a recipient list
-  def transferRecipientData
-    Net::SFTP.start(@config["scpHost"], @config["scpUsername"], :password => @config["scpPassword"], :port => @config["scpPort"]) do |sftp|
-      sftp.upload!(@config["localRecipientFile"], remote_filename)
-      puts "uploaded recipient data (#{@config["localRecipientFile"]})"
-    end
+  # Triggers the import for a batch, after a recipient file was uploaded to the SFTP
+  def addRecipients(filePath)
+    @restClient.doPost("batch_mailings/#{mailing_id}/recipients", File.read(filePath))
+    puts "added recipients to recipient list"
   end
 
-  # Triggers the import for a batch, after a recipient file was uploaded to the SFTP
-  def triggerImport
-    @restClient.doPost("batches/#{mailing_id}/import", @XmlRequests.import_xml)
+  # Returns revision number for a transactional mail
+  def finishRecipients
+    @restClient.doPost("batch_mailings/#{mailing_id}/recipients/status?status=Finished", "<nothing/>")
+    puts "finished the recipient list"
   end
 
   # Returns revision number for a transactional mail

@@ -1,4 +1,4 @@
-require 'APIClient.rb'
+require './APIClient.rb'
 
 #load config
 config = YAML.load_file("config.yml")
