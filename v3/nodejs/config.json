@@ -1,0 +1,14 @@
+{
+	"username": "<username>",
+	"password": "<password hash>",
+	"api_url": "https://<api.hostname>/v3",
+
+	"domain": "<domain>",
+	"senderId": "<sender id>",
+	"senderName": "<sender name>",
+	"senderAddress": "<sender address>",
+	"fields": {
+		"RCPT_TYPE_V3": "numeric",
+		"LANGUAGE_V3": "text"
+	}
+}
