@@ -1,5 +1,5 @@
 <batch_mailing>
-  <start_date>{rundate}</start_date>
+  <start_date>{startdate}</start_date>
   <properties>
     <property key="Sender">default</property>
     <property key="Language">en</property>

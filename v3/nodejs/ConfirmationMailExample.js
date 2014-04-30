@@ -12,7 +12,7 @@ client.createAPI("./config.json");
 var transactionalMailingXml=fs.readFileSync("confirmation.xml",{encoding:"utf8"});
 var recipients1=fs.readFileSync("recipients.csv",{encoding:"utf8"});
 var recipients2=fs.readFileSync("recipients2.csv",{encoding:"utf8"});
-var mailingId="TA01";
+var mailingId="TA" + (new Date().getTime()).toString();
 
 async.waterfall([
     function (callback) {
@@ -38,10 +38,3 @@ async.waterfall([
         log("done");
     }
 });
-
-
-
-
-
-
-

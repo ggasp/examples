@@ -40,22 +40,22 @@ exports.preview=function (callback,xml ,email, fields){
     });
 };
 
-exports.addRecipients=function(callback,recipientsCsv){
+exports.addRecipients=function(callback,mailingId,recipientsCsv){
     makeAuthPostRequest("batch_mailings/"+mailingId+"/recipients",recipientsCsv,function(err,result) {
         if (err) {
             callback(err);
         } else {
-            callback(null);
+            callback(null,result);
         }
     });
 }
 
-exports.finishRecipients=function(callback){
+exports.finishRecipients=function(callback,mailingId){
     makeAuthPostRequest("batch_mailings/"+mailingId+"/recipients/status?status=Finished","",function (err,result) {
         if (err) {
             callback(err);
         } else {
-            callback(result);
+            callback(null,result);
         }
     });    
 }
@@ -67,6 +67,7 @@ exports.getStatus=function(callback,mailingId){
 exports.createTransactionalMailing=function(callback,mailingXml,mailingId){
     mailingXml=mailingXml.replace(/{domain}/,config.domain);
     makeAuthPostRequest("transactional_mailings/"+mailingId,mailingXml,function (err,result) {
+        log(result);
         if (err) {
             callback(err);
         } else {
@@ -85,6 +86,7 @@ exports.publishRevision=function(callback,mailingId){
             log(err);
             callback(err);
         } else {
+            log(result);
             var revisionId=result.match(/id="(.*?)"/)[1];
             callback(null,revisionId);
         }
@@ -105,6 +107,7 @@ exports.deleteTransactionalMailingRevision=function(callback,mailingId,revisionI
 
 exports.sendTransactional=function(callback,mailingId,revisionId,recipientsCsv){
     makeAuthPostRequest("transactional_mailings/"+mailingId+"/revisions/"+revisionId+"/recipients",recipientsCsv,function(err,result) {
+        log(result);
         if (err) {
             callback(err);
         } else {
