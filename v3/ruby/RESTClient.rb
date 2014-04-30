@@ -22,17 +22,22 @@ class RESTClient
   private
 
   def doRequest(resource_path, xml, method)
-    https = Net::HTTP.new(@apiHost, Net::HTTP.https_default_port)
-    https.use_ssl = true
 
-    https.start() { |http|
+    uri = URI(@apiHost + @apiBase + resource_path)
+    #puts "URI = '#{uri}'"
+
+    Net::HTTP.start(
+      uri.host, uri.port,
+      :use_ssl => uri.scheme == 'https',
+      :verify_mode => OpenSSL::SSL::VERIFY_NONE
+    ) { |http|
       case method
         when 'Put'
-          req = Net::HTTP::Put.new(@apiBase + resource_path)
+          req = Net::HTTP::Put.new(uri.request_uri)
         when 'Post'
-          req = Net::HTTP::Post.new(@apiBase + resource_path)
+          req = Net::HTTP::Post.new(uri.request_uri)
         else
-          req = Net::HTTP::Get.new(@apiBase + resource_path)
+          req = Net::HTTP::Get.new(uri.request_uri)
       end
 
       req.basic_auth(@apiUsername, @apiPasswordHash)

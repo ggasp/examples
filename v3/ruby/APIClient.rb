@@ -5,17 +5,6 @@ require 'net/https'
 require './XMLRequests.rb'
 require './RESTClient.rb'
 
-# Little workaround to prevent ssl to send a warning every time
-# is not needed for the api!
-class Net::HTTP
-  alias_method :old_initialize, :initialize
-  def initialize(*args)
-    old_initialize(*args)
-    @ssl_context = OpenSSL::SSL::SSLContext.new
-    @ssl_context.verify_mode = OpenSSL::SSL::VERIFY_NONE
-  end
-end
-
 # Add the to_iso_format method to the Time class to
 # ease formatting of dates
 class Time
@@ -129,10 +118,10 @@ class APIClient
   def loadAvailableFields
     require "rexml/document"
 
-    fields = @restClient.doGet('fields')
+    fields = @restClient.doGet('recipient_fields')
     xml = REXML::Document.new(fields)
     names = []
-    xml.elements['fields'].elements.each('field') do |field|
+    xml.elements['recipient_fields'].elements.each('field') do |field|
       names << field.attributes['name']
     end
 
@@ -144,6 +133,6 @@ class APIClient
       field[1] = "text"
     end
 
-    @restClient.doPost('fields', @XmlRequests.field_xml(field[0], field[1]))
+    @restClient.doPost('recipient_fields', @XmlRequests.field_xml(field[0], field[1]))
   end
 end

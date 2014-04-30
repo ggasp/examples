@@ -6,8 +6,8 @@ broadcasting system.
 
 ## Requirements ##
 
-1. Ruby >= 1.8.7
-2. builder (gem install builder)
+1. Ruby >= 1.9.3p194
+2. builder (Install by calling `gem install builder`)
 
 ## Newsletter Example ##
 
