@@ -1,62 +1,22 @@
 package com.emarsys.e3.api.example;
 
-import org.restlet.Response;
-import org.restlet.data.Status;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
-import org.w3c.dom.Document;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathFactory;
-
-import java.beans.XMLDecoder;
-import java.io.IOException;
-import java.io.StringReader;
 import java.io.File;
-
-import java.lang.Object;
-import java.lang.String;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import static java.lang.System.out;
+import java.io.IOException;
 
 /**
  * BatchMailing forms the primary entry point to the emarsys API.
- * <p/>
+ * <p>
  * The BatchMailing is a wrapper around the HTTP requests
  * needed in order to communicate with the API.
- * <p/>
  *
  * @author Michael Kulovits <kulovits@emarsys.com>
  */
 public class BatchMailing {
 
-    //constructor params
     private final String name;
-    //state
-    private boolean created = false;
-
-    //client subsystems
     private final APIClient apiClient;
 
-    /**
-     * Constructor.
-     *
-     * @param name   - the unique id of the batch mailing
-     * @param config - the config
-     */
-    public BatchMailing(String name, ClientConfiguration config) {
-
+    private BatchMailing(String name, ClientConfiguration config) {
         this.name = name;
         this.apiClient = new APIClient(config);
     }
@@ -64,36 +24,40 @@ public class BatchMailing {
     /**
      * Creates the batch mailing via an API call.
      *
-     * @throws APIException
+     * @param name  the unique id of the batch mailing
+     * @param config the config
+     * @return a new batch-mailing with the given name
+     * @throws APIException if the status code of the response != 200
+     * @throws IOException if some IO error occurs
      */
-    public void create() throws APIException {
-
-        apiClient.createBatchMailing(name);
-        created = true;
+    public static BatchMailing create(String name, ClientConfiguration config) throws IOException {
+        BatchMailing mailing = new BatchMailing(name, config);
+        mailing.apiClient.createBatchMailing(name);
+        return mailing;
     }
 
     /**
      * Transfers the content of the passed file (the recipients) via an API call.
      *
-     * @throws APIException
-     * @throws IOException
+     * @throws APIException if the status code of the response != 200
+     * @throws IOException if some IO error occurs
      */
-    public void transferRecipientList(String recipientFile) throws APIException, IOException {
-        apiClient.postBatchRecipients( this.name, new File( recipientFile ) );
+    public void transferRecipients(File recipientFile) throws IOException {
+        apiClient.postBatchRecipients( name, recipientFile );
     }
 
     /**
      * Closes (finishes) the current list of recipients.
      *
-     * @throws APIException
-     * @throws IOException
+     * @throws APIException if the status code of the response != 200
+     * @throws IOException if some IO error occurs
      */
-    public void finishRecipientList() throws APIException, IOException {
-        apiClient.finishBatchRecipients( this.name );
+    public void finishRecipientTransfer() throws IOException {
+        apiClient.finishBatchRecipients( name );
     }
 
     @Override
     public String toString() {
-        return this.getClass().getSimpleName() + ":" + this.name;
+        return getClass().getSimpleName() + ":" + name;
     }
-}//class BatchMailing
+}

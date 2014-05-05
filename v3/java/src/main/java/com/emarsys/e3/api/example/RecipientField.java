@@ -4,14 +4,22 @@ package com.emarsys.e3.api.example;
  * A simple helper class representing a recipient related field.
  */
 public class RecipientField {
-    private String name;
-    private String type = "TEXT";
+    private final String name;
+    private final String type;
 
-    public RecipientField (String[] info) {
-        this.name = info[0];
-        if ( info.length > 1 ) {
-            this.type = info[1];
-        }
+    public RecipientField (String name, String type) {
+        this.name = name;
+        this.type = type;
+    }
+
+    public static RecipientField create( String value ) {
+
+        String[] info = value.split(":");
+
+        return new RecipientField(
+            info[0],
+            (info.length > 1) ? info[1] : "TEXT"
+        );
     }
 
     public String getName() {

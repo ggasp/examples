@@ -2,11 +2,10 @@ package com.emarsys.e3.api.example;
 
 import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
 
-import org.joda.time.format. DateTimeFormat;
-import org.joda.time.DateTime;
-
-import java.lang.String;
 import java.text.MessageFormat;
+
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 
 
 /**

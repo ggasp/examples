@@ -1,21 +1,22 @@
 package com.emarsys.e3.api.example;
 
+import static java.lang.System.err;
+import static java.lang.System.out;
+
 import java.io.IOException;
+import java.net.URL;
 import java.util.Arrays;
 
 import org.restlet.Client;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Protocol;
-import org.restlet.Request;
-import org.restlet.Response;
 import org.restlet.data.Status;
 import org.restlet.representation.StringRepresentation;
-
-import static java.lang.System.err;
-import static java.lang.System.out;
 
 /**
  * <p>
@@ -56,8 +57,8 @@ final class RESTClient {
      * @return
      * @throws IOException
      */
-    Response doGet(String url) throws IOException {
-        return doRequest(new Request(Method.GET, url));
+    Response doGet(URL url) throws IOException {
+        return doRequest(new Request(Method.GET, url.toExternalForm()));
     }
 
     /**
@@ -68,7 +69,7 @@ final class RESTClient {
      * @return
      * @throws IOException
      */
-    Response doPostXML(String url, String xmlContent) throws IOException {
+    Response doPostXML(URL url, String xmlContent) throws IOException {
         return doPost( url, xmlContent, MediaType.APPLICATION_XML );
     }
 
@@ -81,8 +82,8 @@ final class RESTClient {
      * @return
      * @throws IOException
      */
-    Response doPost(String url, String content, MediaType mediaType ) throws IOException {
-        return doRequest(new Request(Method.POST, url,
+    Response doPost(URL url, String content, MediaType mediaType ) throws IOException {
+        return doRequest(new Request(Method.POST, url.toExternalForm(),
                 new StringRepresentation(content, mediaType))
         );
     }
@@ -95,8 +96,8 @@ final class RESTClient {
      * @return
      * @throws IOException
      */
-    Response doPutXML(String url, String xmlContent) throws IOException {
-        return doRequest(new Request(Method.PUT, url,
+    Response doPutXML(URL url, String xmlContent) throws IOException {
+        return doRequest(new Request(Method.PUT, url.toExternalForm(),
                 new StringRepresentation(xmlContent, MediaType.APPLICATION_XML)));
     }
 

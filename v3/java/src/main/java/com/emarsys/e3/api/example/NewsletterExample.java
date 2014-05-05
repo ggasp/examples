@@ -1,17 +1,13 @@
 package com.emarsys.e3.api.example;
 
+import static java.lang.System.out;
+
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.String;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
-import static java.lang.System.err;
-import static java.lang.System.out;
+import org.apache.commons.io.FileUtils;
 
 /**
  * NewsletterExample implements a simple demo client for the emarsys Batch Mailing API.
@@ -32,73 +28,6 @@ import static java.lang.System.out;
  * @author Alexander Kraml <kraml@emarsys.com>
  */
 public final class NewsletterExample {
-
-    /**
-     * PropertiesClientConfig provides the ClientConfiguration for the NewsletterExample
-     * based on the passed Properties.
-     *
-     * @author Michael Kulovits <kulovits@emarsys.com>
-     */
-    private class PropertiesClientConfig implements ClientConfiguration {
-
-        private final Properties props;
-
-        private PropertiesClientConfig( Properties props ) {
-            this.props = props;
-        }
-
-        @Override
-        public String getApiUsername() {
-            return this.props.getProperty( "apiUsername" );
-        }
-
-        @Override
-        public String getApiPasswordHash() {
-            return this.props.getProperty( "apiPasswordHash" );
-        }
-
-        @Override
-        public String getApiBaseURL() {
-            return this.props.getProperty( "apiBaseUrl" );
-        }
-
-        @Override
-        public String getLinkDomain() {
-            return this.props.getProperty( "linkDomain" );
-        }
-
-        @Override
-        public String getSenderId() {
-            return this.props.getProperty( "senderId" );
-        }
-
-        @Override
-        public String getSenderName() {
-            return this.props.getProperty( "senderName" );
-        }
-
-        @Override
-        public String getSenderAddress() {
-            return this.props.getProperty( "senderAddress" );
-        }
-
-        @Override
-        public String getLocalRecipientFile(int num) {
-            return this.props.getProperty( "localRecipientFile" );
-        }
-
-        @Override
-        public List<RecipientField> getFields() {
-            List<RecipientField> fields = new ArrayList<RecipientField>();
-
-            String [] fields_information = this.props.getProperty( "fields" ).split(",");
-            for (String information : fields_information) {
-                String [] info = information.split(":");
-                fields.add( new RecipientField( info ) );
-            }
-            return fields;
-        }
-    }
 
     private String batchName;
     private ClientConfiguration config;
@@ -132,12 +61,23 @@ public final class NewsletterExample {
             NewsletterExample example;
             example = new NewsletterExample("BatchExample" + System.currentTimeMillis());
 
-            out.println("creating batch mailing!");
+            out.println("Creating batch mailing...");
+            BatchMailing batchMailing = BatchMailing.create(example.batchName, example.config);
 
-            BatchMailing batchMailing = new BatchMailing(example.batchName, example.config);
-            batchMailing.create();
-            batchMailing.transferRecipientList(example.config.getLocalRecipientFile(0));
-            batchMailing.finishRecipientList();
+            out.println("Transferring recipient list...");
+
+            File recipientFile = example.config.getLocalRecipientFile(0);
+            out.println("Recipients:\n" + FileUtils.readFileToString( recipientFile ));
+
+            // The method can be called multiple time, with different recipient
+            // files. This allows to transfer the recipients when they are available.
+            batchMailing.transferRecipients( recipientFile );
+
+
+            // When all recipients have been transferred, the recipient-transfer
+            // MUST be finished.
+            out.println("Finishing recipient-transfer...");
+            batchMailing.finishRecipientTransfer();
 
         } catch (Exception ex) {
             ex.printStackTrace();

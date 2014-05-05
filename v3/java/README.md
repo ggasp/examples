@@ -14,7 +14,7 @@ Run the following code from a console to execute the examples (all required depe
 1. `./gradlew runNewsletterExample` (for execution of the newsletter example)
 2. `./gradlew runConfirmationExample` (for execution of the confirmation mail example)
 
-
+Before you can run the examples, you have to adapt the `config.props` and the `recipients.csv` files.
 
 ## Basic Newsletter Example ##
 
@@ -27,7 +27,7 @@ Refer to `config.props` in order explore or change the configuration of the clie
 The example creates a simple HTML mail (no plain text content) with a single link and three conditional contents
 (##SUBJECT##, ##HEADER## and ##FOOTER##) and further demos the usage of personalization variables ($$RCPT_DOMAIN$$), too.
 
-The recipients of the generated newletters are stored in `recipients.csv`. You might want to change the email addresses to point to actual mail boxes.
+The recipients of the generated newsletters are stored in `recipients.csv`. You might want to change the email addresses to point to actual mail boxes.
 
 Further you can add fields (aka columns) to the recipient data (you also have to do that in the config.props then).
 
@@ -36,7 +36,7 @@ Further you can add fields (aka columns) to the recipient data (you also have to
 
 The basic confirmation mail example creates a transactional mailing, publishes it, and sends it out to 2 groups of recipients.
 
-The program executed can be found in `src/main/scala/com/emarsys/e3/api/ConfirmationMail.java`
+The program executed can be found in `src/main/scala/com/emarsys/e3/api/ConfirmationMailExample.java`
 
 Refer to `config.props` in order explore or change the configuration of the client.
 

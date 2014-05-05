@@ -4,8 +4,30 @@ description = 'Java API Example'
 apply plugin: 'java'
 apply plugin: 'idea'
 
+repositories {
+    mavenCentral()
+    maven {
+        url "http://maven.restlet.org/"
+    }
+}
+
+dependencies {
+    compile 'commons-lang:commons-lang:2.6'
+    compile 'commons-io:commons-io:2.4'
+    compile 'joda-time:joda-time:2.3'
+    compile 'org.restlet.jee:org.restlet:2.2.0'
+    compile 'org.restlet.jee:org.restlet.ext.httpclient:2.2.0'
+}
+
+allprojects { Project prj ->
+    if (prj.plugins.hasPlugin('java')) {
+        sourceCompatibility = '1.6'
+        targetCompatibility = '1.6'
+    }
+}
+
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.11'
+    gradleVersion = '1.12'
 }
 
 task(runNewsletterExample, dependsOn: 'classes', type: JavaExec) {
@@ -18,16 +40,3 @@ task(runConfirmationExample, dependsOn: 'classes', type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
 }
 
-repositories {
-    mavenCentral()
-    maven {
-        url "http://maven.restlet.org/"
-    }
-}
-
-dependencies {
-    compile 'commons-lang:commons-lang:2.6'
-    compile 'joda-time:joda-time:2.3'
-    compile 'org.restlet.jee:org.restlet:2.2.0'
-    compile 'org.restlet.jee:org.restlet.ext.httpclient:2.2.0'
-}

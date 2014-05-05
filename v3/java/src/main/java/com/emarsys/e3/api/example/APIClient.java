@@ -1,212 +1,176 @@
 package com.emarsys.e3.api.example;
 
 import java.io.File;
-import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.IOException;
 import java.io.StringReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
-
-import org.restlet.Response;
-import org.restlet.data.MediaType;
-import org.restlet.data.Status;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-
-import org.w3c.dom.Document;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
-import java.io.IOException;
-
-import java.lang.String;
-import java.util.ArrayList;
-import java.util.List;
-
-import static java.lang.System.out;
+import org.apache.commons.io.FileUtils;
+import org.restlet.Response;
+import org.restlet.data.MediaType;
+import org.restlet.data.Status;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 /**
  * BatchMailing forms the primary entry point to the emarsys API.
- * <p/>
+ * <p>
  * The BatchMailing is a wrapper around the HTTP requests
  * needed in order to communicate with the API.
- * <p/>
+ *
  * @author Michael Kulovits <kulovits@emarsys.com>
  */
 public class APIClient {
 
-    //constructor params
     private final ClientConfiguration config;
+    private final URL fieldRequestURL;
+    private final URL senderRequestURL;
 
-    //eagerly evaluated values
-    private final String fieldRequestURL;
-    private final String senderRequestURL;
-
-    //client subsystems
     private final RESTClient restClient;
 
 
     /**
-     * Constructor.
+     * Create a new APIClient object.
      *
-     * @param config - the config
+     * @param config the client configuration config
      */
     public APIClient(ClientConfiguration config) {
-
-        this.config = config;
-        this.fieldRequestURL = this.config.getApiBaseURL() + "recipient_fields";
-        this.senderRequestURL = this.config.getApiBaseURL() + "senders";
-        this.restClient = new RESTClient(config);
-    }
-
-
-    protected void fireFailedRequest(String msg, Status status) throws APIException {
-        throw new APIException(this + ": " + msg + ", status " + status);
-    }
-
-    protected void fireFailedRequest(String msg, Exception ex) throws APIException {
-        throw new APIException(this + ": " + msg + ": " + ex.getMessage(), ex);
+        try {
+            this.config = config;
+            this.fieldRequestURL = new URL(config.getApiBaseURL(), "recipient_fields");
+            this.senderRequestURL = new URL(config.getApiBaseURL(), "senders");
+            this.restClient = new RESTClient(config);
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException("Invalid URL.", e);
+        }
     }
 
     /**
      * Creates the batch mailing via an API call.
      *
-     * @throws APIException
+     * @throws APIException if the status code of the response != 200
+     * @throws IOException if some IO error occurs
      */
-    public void createBatchMailing(String name) throws APIException {
-        try {
+    public void createBatchMailing(String name) throws IOException {
+        this.createMissingSender();
+        this.createMissingRecipientFields();
 
-            this.createMissingSender();
-            this.createMissingRecipientFields();
+        URL requestURL = new URL(config.getApiBaseURL(), "batch_mailings/" + name);
+        Response response = restClient.doPostXML(
+            requestURL,
+            XMLRequests.createBatchMailingRequest(name, this.config.getLinkDomain())
+        );
 
-            String requestURL = this.config.getApiBaseURL() + "batch_mailings/" + name;
-            Response response = this.restClient.doPostXML(
-                requestURL,
-                XMLRequests.createBatchMailingRequest(name, this.config.getLinkDomain())
-            );
-
-            if (Status.SUCCESS_OK.equals(response.getStatus())) {
-                out.println("successfully created " + name);
-            } else {
-                fireFailedRequest("failed batch request", response.getStatus());
-            }
-
-        } catch (IOException ex) {
-            fireFailedRequest("failed batch request!", ex);
+        if (!Status.SUCCESS_OK.equals(response.getStatus())) {
+            throw new APIException("Creation of Batch mailing failed: " + response.getStatus());
         }
     }
 
     /**
      * Creates the mailing via an API call.
      *
-     * @throws APIException
+     * @throws APIException if the status code of the response != 200
+     * @throws IOException if some IO error occurs
      */
-    public void createTransactionalMailing(String name) throws APIException {
-        try {
+    public void createTransactionalMailing(String name) throws IOException {
+        createMissingSender();
+        createMissingRecipientFields();
 
-            this.createMissingSender();
-            this.createMissingRecipientFields();
+        URL requestURL = getTransactionalMailingURL( name );
+        List<RecipientField> recipientFields = config.getFields();
+        String fields = "";
 
-            String requestURL = getTransactionalMailingURL( name );
-            List<RecipientField> recipientFields = this.config.getFields();
-            String fields = "";
+        for ( RecipientField recipientField : recipientFields ) {
+            fields += "<field name=\"" + recipientField.getName() + "\"/>";
+        }
 
-            for( RecipientField recipientField : recipientFields ) {
-                fields += "<field name=\"" + recipientField.getName() + "\"/>";
-            }
+        Response response = restClient.doPostXML(
+            requestURL,
+            XMLRequests.createTransactionalMailingRequest(name, config.getLinkDomain(), fields)
+        );
 
-            Response response = this.restClient.doPostXML(
-                requestURL,
-                XMLRequests.createTransactionalMailingRequest(name, this.config.getLinkDomain(), fields)
-            );
-
-            if ( Status.SUCCESS_OK.equals( response.getStatus() ) ) {
-                out.println( "successfully created " + this );
-            } else {
-                throw new APIException( this + ": failed request: " + response.getStatus() );
-            }
-        } catch (IOException ex) {
-            throw new APIException( this + ": failed request: " + ex.getMessage(), ex );
+        if ( !Status.SUCCESS_OK.equals( response.getStatus() ) ) {
+            throw new APIException("Creation of TXM failed: " + response.getStatus() );
         }
     }
 
     /**
-     * Creates a new revision of the current content of the transaction mailing
+     * Creates a new revision of the current content of the transaction mailing.
      *
      * @return the identifier of the newly created revision.
+     * @throws APIException if the status code of the response != 200
+     * @throws IOException if some IO error occurs
      */
-    public int createRevision(String mailingID) throws APIException {
-        try {
-            String requestURL = getTransactionalMailingURL( mailingID ) + "/revisions";
-            Response response = this.restClient.doPostXML(requestURL, "");
-            String xml = response.getEntity().getText();
-            NodeList nodes = parseXml( xml, "//revision/@id" );
+    public int createRevision(String mailingID) throws IOException {
+        URL requestURL = new URL(getTransactionalMailingURL( mailingID ), "revisions");
+        Response response = this.restClient.doPostXML(requestURL, "");
+        String xml = response.getEntity().getText();
+        NodeList nodes = parseXml( xml, "//revision/@id" );
 
-            return Integer.valueOf( nodes.item(0).getNodeValue() ).intValue();
-        }
-        catch (IOException ex) {
-            throw new APIException( this + ": failed request: " + ex.getMessage(), ex );
-        }
+        return Integer.parseInt( nodes.item(0).getNodeValue() );
     }
 
 
     /**
-     * Compares the Fields already in the Account with those we want to use
+     * Compares the Fields already in the Account with those we want to use.
      *
-     * @throws APIException
+     * @throws APIException if the status code of the response != 200
+     * @throws IOException if some IO error occurs
      */
-    private void createMissingRecipientFields() throws APIException {
-        List<RecipientField> recipientFields = this.config.getFields();
+    private void createMissingRecipientFields() throws IOException {
+        List<RecipientField> recipientFields = config.getFields();
         List<String> availableFields = loadAvailableFields();
 
         for ( RecipientField field :  recipientFields ) {
             if( !availableFields.contains( field.getName() ) ) {
-                this.addField( field.getName(), field.getType() );
+                addField(field.getName(), field.getType());
             }
         }
     }
 
     /**
-     * Compares the Senders already in the Account with the one we want to use
+     * Compares the Senders already in the Account with the one we want to use.
      *
-     * @throws APIException
+     * @throws APIException if the status code of the response != 200
+     * @throws IOException if some IO error occurs
      */
-    private void createMissingSender() throws APIException {
+    private void createMissingSender() throws IOException {
         List<String> availableSenders = loadAvailableSenders();
-        if ( !availableSenders.contains( this.config.getSenderId() ) ) {
-            this.addSender();
+        if ( !availableSenders.contains( config.getSenderId() ) ) {
+            addSender();
         }
     }
 
     /**
      * Loads all fields currently in the account into the class via an API call.
      *
-     * @throws APIException
+     * @throws APIException if the status code of the response != 200
+     * @throws IOException if some IO error occurs
      */
-    private List<String> loadAvailableFields() throws APIException {
+    private List<String> loadAvailableFields() throws IOException {
         List<String> availableFields = new ArrayList<String>();
 
-        try {
-            Response response = this.restClient.doGet(this.fieldRequestURL);
-            String xml = response.getEntity().getText();
+        Response response = restClient.doGet(this.fieldRequestURL);
+        String xml = response.getEntity().getText();
 
-            NodeList nodes = parseXml( xml, "//field/@name" );
+        NodeList nodes = parseXml( xml, "//field/@name" );
+        for (int i = 0; i < nodes.getLength(); i++) {
+            availableFields.add(nodes.item(i).getNodeValue());
+        }
 
-            for (int i = 0; i < nodes.getLength(); i++) {
-                availableFields.add(nodes.item(i).getNodeValue().toString());
-            }
-
-            if (Status.SUCCESS_OK.equals(response.getStatus())) {
-                out.println("successfully loaded available fields");
-            } else {
-                fireFailedRequest("failed to load available fields", response.getStatus());
-            }
-        }catch (Exception ex) {
-            fireFailedRequest("failed to load recipient fields: " + ex, ex);
+        if (!Status.SUCCESS_OK.equals(response.getStatus())) {
+            throw new APIException("Loading available fields failed: " + response.getStatus());
         }
 
         return availableFields;
@@ -215,28 +179,22 @@ public class APIClient {
     /**
      * Loads all senders currently in the account into the class via an API call.
      *
-     * @throws APIException
+     * @throws APIException if the status code of the response != 200
+     * @throws IOException if some IO error occurs
      */
-    private List<String> loadAvailableSenders() throws APIException {
+    private List<String> loadAvailableSenders() throws IOException {
         List<String> availableSenders = new ArrayList<String>();
 
-        try {
-            Response response = this.restClient.doGet(this.senderRequestURL);
-            String xml = response.getEntity().getText();
+        Response response = restClient.doGet(senderRequestURL);
+        String xml = response.getEntity().getText();
 
-            NodeList nodes = parseXml( xml, "//sender/@id" );
+        NodeList nodes = parseXml( xml, "//sender/@id" );
+        for (int i = 0; i < nodes.getLength(); i++) {
+            availableSenders.add(nodes.item(i).getNodeValue());
+        }
 
-            for (int i = 0; i < nodes.getLength(); i++) {
-                availableSenders.add(nodes.item(i).getNodeValue().toString());
-            }
-
-            if (Status.SUCCESS_OK.equals(response.getStatus())) {
-                out.println("successfully loaded available senders");
-            } else {
-                fireFailedRequest("failed to load available senders", response.getStatus());
-            }
-        }catch (Exception ex) {
-            fireFailedRequest("failed to load senders: " + ex, ex);
+        if (!Status.SUCCESS_OK.equals(response.getStatus())) {
+            throw new APIException("Loading available senders failed: " + response.getStatus());
         }
 
         return availableSenders;
@@ -245,13 +203,13 @@ public class APIClient {
     /**
      * Posts the recipient list for a transactional mailing via an API call.
      *
-     * @throws APIException
-     * @throws IOException
+     * @throws IOException if some IO error occurs
      */
-    public void postTransactionalRecipients( String name, int revision, File recipientFile ) throws APIException, IOException {
-
-        postRecipients( 
-            getTransactionalMailingURL( name ) + "/revisions/" + revision + "/recipients",
+    public void postTransactionalRecipients( String name, int revision, File recipientFile )
+        throws IOException
+    {
+        postRecipients(
+            new URL(getTransactionalMailingURL( name ), "revisions/" + revision + "/recipients"),
             name,
             recipientFile
         );
@@ -260,13 +218,13 @@ public class APIClient {
     /**
      * Posts the recipient list for a batch mailing via an API call.
      *
-     * @throws APIException
-     * @throws IOException
+     * @throws IOException if some IO error occurs
      */
-    public void postBatchRecipients( String name, File recipientFile ) throws APIException, IOException {
-
-        postRecipients( 
-            getBatchMailingURL( name ) + "/recipients",
+    public void postBatchRecipients( String name, File recipientFile )
+        throws IOException
+    {
+        postRecipients(
+            new URL(getBatchMailingURL( name ), "recipients"),
             name,
             recipientFile
         );
@@ -275,106 +233,75 @@ public class APIClient {
     /**
      * Finishes the recipient list for a batch mailing via an API call.
      *
-     * @throws APIException
-     * @throws IOException
+     * @throws APIException if the status code of the response != 200
+     * @throws IOException if some IO error occurs
      */
-    public void finishBatchRecipients( String name ) throws APIException, IOException {
-
-        String requestURL = getBatchMailingURL( name ) + "/recipients/status?status=Finished";
+    public void finishBatchRecipients( String name ) throws IOException {
+        URL requestURL = new URL(getBatchMailingURL( name ), "recipients/status?status=Finished");
         Response response = this.restClient.doPostXML(requestURL, "");
-        if( Status.SUCCESS_OK.equals( response.getStatus() ) ) {
-            out.println( "Finished the recipient list.");
+
+        if( !Status.SUCCESS_OK.equals( response.getStatus() ) ) {
+            throw new APIException("Finishing recipients list failed: " + response.getStatus());
         }
     }
 
     /**
      * Posts the recipient list via an API call to a specific URL.
      *
-     * @throws APIException
-     * @throws IOException
+     * @throws APIException if the status code of the response != 200
+     * @throws IOException if some IO error occurs
      */
-    private void postRecipients( String requestURL, String name, File recipientFile ) throws APIException, IOException {
-
-        String recipients = getRecipients( recipientFile );
+    private void postRecipients( URL requestURL, String name, File recipientFile )
+        throws IOException
+    {
+        String recipients = FileUtils.readFileToString(recipientFile, "UTF-8");
         Response response = this.restClient.doPost(requestURL, recipients, MediaType.TEXT_CSV);
 
-        if( Status.SUCCESS_OK.equals( response.getStatus() ) ) {
-            out.println( "Posted recipients:");
-            out.println(recipients);
+        if ( !Status.SUCCESS_OK.equals( response.getStatus() ) ) {
+            throw new APIException("Adding recipients list failed: " + response.getStatus());
         }
-    }
-
-    private String getRecipients(File file) throws IOException {
-        BufferedReader br = new BufferedReader( new FileReader( file ) );
-
-        StringBuilder sb = new StringBuilder();
-        String line = null;
-
-        while ( ( line = br.readLine() ) != null ) {
-            sb.append( line + "\n" );
-        }
-        String recipients = sb.toString();
-
-        br.close();
-
-        return recipients;
     }
 
     /**
      * Adds fields via an API call.
      *
-     * @throws APIException
+     * @throws APIException if the status code of the response != 200
+     * @throws IOException if some IO error occurs
      */
-    private void addField(String name, String type) throws APIException {
-        try {
-            Response response = this.restClient.doPostXML(
-                this.fieldRequestURL,
-                XMLRequests.addFieldRequest(name, type)
-            );
+    private void addField(String name, String type) throws IOException {
+        Response response = restClient.doPostXML(
+            fieldRequestURL,
+            XMLRequests.addFieldRequest(name, type)
+        );
 
-            if (Status.SUCCESS_OK.equals(response.getStatus())) {
-                out.println("successfully added field" + name);
-            } else {
-                fireFailedRequest("failed to add field", response.getStatus());
-            }
-        }catch (IOException ex) {
-            fireFailedRequest("failed to add field!", ex);
+        if (!Status.SUCCESS_OK.equals(response.getStatus())) {
+            throw new APIException("Adding field " + name + " failed: " +response.getStatus());
         }
     }
 
     /**
      * Adds senders via an API call.
      *
-     * @throws APIException
+     * @throws APIException if the status code of the response != 200
+     * @throws IOException if some IO error occurs
      */
-    private void addSender() throws APIException {
-        try {
-            Response response = this.restClient.doPutXML(
-                this.senderRequestURL + "/" + this.config.getSenderId(),
-                XMLRequests.addSenderRequest(this.config.getSenderName(), this.config.getSenderAddress())
-            );
+    private void addSender() throws IOException {
+        Response response = restClient.doPutXML(
+            new URL(senderRequestURL, config.getSenderId()),
+            XMLRequests.addSenderRequest(config.getSenderName(), config.getSenderAddress())
+        );
 
-            if (Status.SUCCESS_OK.equals(response.getStatus())) {
-                out.println("successfully created sender" + this.config.getSenderName());
-            } else {
-                fireFailedRequest("failed to add sender", response.getStatus());
-            }
-        } catch (IOException ex) {
-            fireFailedRequest("failed to add sender!", ex);
+        if ( !Status.SUCCESS_OK.equals(response.getStatus()) ) {
+            throw new APIException(
+                "Adding sender " + config.getSenderId() + " failed: " + response.getStatus()
+            );
         }
     }
 
     /**
      * XPath parser for the xml responses
-     *
-     * @param xml
-     * @param XPExpression
-     * @return NodeList
-     * @throws APIException
      */
     private NodeList parseXml( String xml, String XPExpression ) throws APIException {
-        NodeList nodes = null;
-
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
@@ -387,21 +314,18 @@ public class APIClient {
             XPathFactory xpf = XPathFactory.newInstance();
             XPath xp = xpf.newXPath();
             XPathExpression xpe = xp.compile( XPExpression );
-            nodes = (NodeList) xpe.evaluate(doc, XPathConstants.NODESET);
-            return nodes;
-        } catch (Exception ex) {
-            fireFailedRequest("failed to parse the given XML", ex);
+            return (NodeList) xpe.evaluate(doc, XPathConstants.NODESET);
+        } catch (Exception e) {
+            throw new APIException("Failed to parse the given XML.", e);
         }
-
-        return nodes;
     }
 
-    private String getBatchMailingURL(String name) {
-        return this.config.getApiBaseURL() + "batch_mailings/" + name;
+    private URL getBatchMailingURL(String name) throws MalformedURLException {
+        return new URL(config.getApiBaseURL(), "batch_mailings/" + name);
     }
 
-    private String getTransactionalMailingURL(String name) {
-        return this.config.getApiBaseURL() + "transactional_mailings/" + name;
+    private URL getTransactionalMailingURL(String name) throws MalformedURLException {
+        return new URL(config.getApiBaseURL(), "transactional_mailings/" + name);
     }
 
-}//class APIClient
+}
