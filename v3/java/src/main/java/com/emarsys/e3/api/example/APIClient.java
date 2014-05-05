@@ -210,7 +210,6 @@ public class APIClient {
     {
         postRecipients(
             new URL(getTransactionalMailingURL( name ), "revisions/" + revision + "/recipients"),
-            name,
             recipientFile
         );
     }
@@ -225,7 +224,6 @@ public class APIClient {
     {
         postRecipients(
             new URL(getBatchMailingURL( name ), "recipients"),
-            name,
             recipientFile
         );
     }
@@ -251,7 +249,7 @@ public class APIClient {
      * @throws APIException if the status code of the response != 200
      * @throws IOException if some IO error occurs
      */
-    private void postRecipients( URL requestURL, String name, File recipientFile )
+    private void postRecipients( URL requestURL, File recipientFile )
         throws IOException
     {
         String recipients = FileUtils.readFileToString(recipientFile, "UTF-8");
@@ -321,11 +319,11 @@ public class APIClient {
     }
 
     private URL getBatchMailingURL(String name) throws MalformedURLException {
-        return new URL(config.getApiBaseURL(), "batch_mailings/" + name);
+        return new URL(config.getApiBaseURL(), "batch_mailings/" + name + "/");
     }
 
     private URL getTransactionalMailingURL(String name) throws MalformedURLException {
-        return new URL(config.getApiBaseURL(), "transactional_mailings/" + name);
+        return new URL(config.getApiBaseURL(), "transactional_mailings/" + name + "/");
     }
 
 }

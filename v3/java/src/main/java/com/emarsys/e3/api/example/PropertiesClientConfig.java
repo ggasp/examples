@@ -62,7 +62,7 @@ class PropertiesClientConfig implements ClientConfiguration {
 
     @Override
     public File getLocalRecipientFile(int num) {
-        String fileName = num == 1 ? "localRecipientFile" : "localRecipientFile" + num;
+        String fileName = ( num == 1 ) ? "localRecipientFile" : "localRecipientFile" + num;
         return new File( props.getProperty( fileName ) );
     }
 

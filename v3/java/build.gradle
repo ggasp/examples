@@ -30,12 +30,12 @@ task wrapper(type: Wrapper) {
     gradleVersion = '1.12'
 }
 
-task(runNewsletterExample, dependsOn: 'classes', type: JavaExec) {
+task(runNewsletterExample, dependsOn: 'compileJava', type: JavaExec) {
     main = 'com.emarsys.e3.api.example.NewsletterExample'
     classpath = sourceSets.main.runtimeClasspath
 }
 
-task(runConfirmationExample, dependsOn: 'classes', type: JavaExec) {
+task(runConfirmationExample, dependsOn: 'compileJava', type: JavaExec) {
     main = 'com.emarsys.e3.api.example.ConfirmationMailExample'
     classpath = sourceSets.main.runtimeClasspath
 }

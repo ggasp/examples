@@ -46,13 +46,6 @@ public final class NewsletterExample {
         this.batchName = batchName;
     }
 
-    /**
-     * Main method.
-     * <p/>
-     * Pass the name of the Batch Mailing as the first command line parameter
-     * otherwise a batch name will be generated.
-     * @param args
-     */
     public static void main(String[] args) {
         try {
 
@@ -66,7 +59,7 @@ public final class NewsletterExample {
 
             out.println("Transferring recipient list...");
 
-            File recipientFile = example.config.getLocalRecipientFile(0);
+            File recipientFile = example.config.getLocalRecipientFile(1);
             out.println("Recipients:\n" + FileUtils.readFileToString( recipientFile ));
 
             // The method can be called multiple time, with different recipient

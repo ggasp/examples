@@ -115,6 +115,7 @@ final class RESTClient {
         Response response = this.client.handle(request);
 
         out.println(
+            getClass().getSimpleName() + ": " +
             request.getResourceRef().toString() + " had response " +
             response.getStatus().toString()
         );
@@ -137,4 +138,4 @@ final class RESTClient {
                 new ChallengeResponse(ChallengeScheme.HTTP_BASIC, apiUsername, apiPasswordHash)
         );
     }
-}//class TxmRESTClient
+}
