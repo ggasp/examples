@@ -3,7 +3,7 @@ apiPasswordHash=<password hash>
 apiBaseUrl=https://<emarsys API URL>/v3/
 linkDomain=<domain>
 
-senderId=default
+senderId=<sender id>
 senderName=<sender name>
 senderAddress=<sender e-mail address>
 
