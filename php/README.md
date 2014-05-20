@@ -32,7 +32,7 @@ further demos the usage of personalization variables ($$RCPT_DOMAIN$$), too.
 
 The program executed can be found in NewsletterExample.php, which contains the
 class BatchMailing. Within BatchMailing is the logic and communication with the
-BMAPI. The HTML content can be altered in XMLRequests.php.
+BMAPI. The HTML content can be altered in confirmation.php or newsletter.php.
 
 Refer to config.php in order explore or change the configuration of the client.
 

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * XmlRequests provides functions to create the XML data for requests to the
+ * This class provides functions to create the XML data for requests to the
  * emarsys Batch Mailing API web server.
  */
 class newsletter {
@@ -166,5 +166,5 @@ class newsletter {
         return $xml;
     }
 
-} //class XmlRequests
+}
 ?>
