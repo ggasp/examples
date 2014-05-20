@@ -135,7 +135,7 @@
          * Add a new field to the account.
          */
         private function addField( $name, $type = 'text' ) {
-            $xml = XmlRequests::fieldXML( $name, $type );
+            $xml = Xconfirmation:fieldXML( $name, $type );
             $this->_restclient->DoPost( $this->_v2_base_url.'/fields', $xml );
             echo "Created Field '".$name."'".PHP_EOL;
         }
@@ -174,7 +174,7 @@
          * Adds a sender to the available senders for the account
          */
         private function addSender( $senderId) {
-            $xml = XmlRequests::senderXML( $this->_config->senderName, $this->_config->senderAddress );
+            $xml = confirmation::senderXML( $this->_config->senderName, $this->_config->senderAddress );
             $this->_restclient->doPut( $this->_v2_base_url.'/senders/'.$senderId, $xml );
             echo "Created sender '".$senderId."'".PHP_EOL;
         }

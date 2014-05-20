@@ -69,8 +69,8 @@
             //init cURL in PHP
             $curl = curl_init( $url );
             // do not accept outdated/invalid certificates and invalid host names
-            curl_setopt( $curl, CURLOPT_SSL_VERIFYPEER, false );
-            curl_setopt( $curl, CURLOPT_SSL_VERIFYHOST, false );
+            curl_setopt( $curl, CURLOPT_SSL_VERIFYPEER, true );
+            curl_setopt( $curl, CURLOPT_SSL_VERIFYHOST, true );
 
             // set the method
             switch ( $method )
