@@ -1,7 +1,7 @@
 <?php
 
 /*
- * XmlRequests provides functions to create the XML data for requests to the
+ * This class provides functions to create the XML data for requests to the
  * emarsys Transactional Mailing API web server.
  */
 class confirmation {
@@ -146,6 +146,6 @@ class confirmation {
         return $xml;
     }
 
-} //class XmlRequests
+}
 
 ?>
