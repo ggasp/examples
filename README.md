@@ -1,4 +1,4 @@
-Emarsys API (V2 - Current ) Code Samples
+Emarsys API Examples
 ====================
 
-This repository contains examples on how to use the e3-api for a bunch of different languages.
+This repository contains examples on how to use the Broadcast API for a number of different languages.
